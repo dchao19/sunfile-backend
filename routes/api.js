@@ -24,7 +24,7 @@ router.get('/auth/register', function (req, res) {
 });
 
 router.post('/auth/register', function (req, res) {
-    Account.register(new Account({ username: req.body.username, firstName: req.body.firstname, lastName: req.body.lastname }), req.body.password, function (err, account) {
+    Account.register(new Account({ username: req.body.username, firstName: req.body.firstName, lastName: req.body.lastName }), req.body.password, function (err, account) {
         if (err) return res.json({ "message": "Error creating account", "errMessage": err })
         else {
             passport.authenticate('local')(req, res, function () {
