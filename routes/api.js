@@ -12,22 +12,26 @@ router.get('/', function (req, res) {
 });
 
 router.get('/auth/register', function (req, res) {
-    Account.register(new Account({ username: req.query.username, firstName: req.query.firstname, lastName: req.query.lastName }), req.query.password, function (err, account) {
+    Account.register(new Account({ username: req.query.username, firstName: req.query.firstname, lastName: req.query.lastname }), req.query.password, function (err, account) {
         if (err) return res.json({ "message": "Error creating account", "errMessage": err })
-        passport.authenticate('local')(req, res, function () {
-            req.session.authenticated = true; 
-            res.json({ "message": "Login and Registration Successful!" }); 
-        })
+        else {
+            passport.authenticate('local')(req, res, function () {
+                req.session.authenticated = true;
+                res.json({ "message": "Login and Registration Successful!" });
+            })
+        }
     });
 });
 
 router.post('/auth/register', function (req, res) {
-    Account.register(new Account({ username: req.body.username, firstName: req.body.firstname, lastname: req.body.lastName }), req.body.password, function (err, account) {
+    Account.register(new Account({ username: req.body.username, firstName: req.body.firstname, lastname: req.body.lastname }), req.body.password, function (err, account) {
         if (err) return res.json({ "message": "Error creating account", "errMessage": err })
-        passport.authenticate('local')(req, res, function () {
-            req.session.authenticated = true;
-            res.json({ "message": "Login and Registration Successful!" });
-        })
+        else {
+            passport.authenticate('local')(req, res, function () {
+                req.session.authenticated = true;
+                res.json({ "message": "Login and Registration Successful!" });
+            })
+        }
     });
 });
 
@@ -56,8 +60,18 @@ router.use(function (req, res, next) {
 
 //LOGIN/LOGOUT/AUTH TESTING
 router.get('/auth/testAuth', function (req, res) {
-    console.log("testing auth: " + JSON.stringify(req.session));
-    res.json({ "message": "Auth good!" });
+    Account.findOne({ "username": req.session.passport.user }, function (err, account) {
+        if (err) res.json({ "message": "Server error", "errMessage": err });
+        else if (!account) res.json({ "message": "No account", "errMessage": "No user with the given account could be found." });
+        else res.json({
+            "message": "Auth good!", "result": {
+                "firstName": account.firstName,
+                "lastName": account.lastName,
+                "teamID": account.teamID,
+                "username": account.username
+            }
+        })
+    });
 });
 
 router.get('/auth/expireCookie', function (req, res) {
