@@ -16,15 +16,15 @@ router.get('/auth/register', function (req, res) {
         if (err) return res.json({ "message": "Error creating account", "errMessage": err })
         else {
             passport.authenticate('local')(req, res, function () {
-                req.session.authenticated = true;
-                res.json({ "message": "Login and Registration Successful!" });
+            req.session.authenticated = true; 
+            res.json({ "message": "Login and Registration Successful!" }); 
             })
-        }
+
     });
 });
 
 router.post('/auth/register', function (req, res) {
-    Account.register(new Account({ username: req.body.username, firstName: req.body.firstname, lastname: req.body.lastname }), req.body.password, function (err, account) {
+    Account.register(new Account({ username: req.body.username, firstName: req.body.firstname, lastName: req.body.lastname }), req.body.password, function (err, account) {
         if (err) return res.json({ "message": "Error creating account", "errMessage": err })
         else {
             passport.authenticate('local')(req, res, function () {
