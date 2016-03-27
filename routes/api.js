@@ -4,6 +4,7 @@ var Account = require('../models/Account');
 var Team = require('../models/Team');
 var passport = require('passport');
 var utils = require('../utils/utils.js');
+var Article = require('../models/Article')
 
 //UNAUTHENTICATED ROUTES
 router.get('/', function (req, res) {
@@ -118,4 +119,56 @@ router.get('/teams/checkuser', function (req, res) {
     });
 });
 
+router.post('/article/new', function (req, res) {
+    var newArticle = new Article({
+        title: req.body.title,
+        teamID: req.body.teamID,
+        longPublication: req.body.fullPublication,
+        shortPublication: req.body.shortPublication,
+        articleContent: req.body.articleContent,
+        user: req.session.passport.user
+    });
+
+    Article.findOne({ 'articleContent': newArticle.articleContent, 'longPublication': newArticle.longPublication, 'teamID': newArticle.teamID }, function (err, article) {
+        if (article) {
+            res.json({ "message": "Duplicated article error", "errMessage": "Somebody from your team has already filed this article!" });
+            return;
+        } else if (err) {
+            res.json({ "message": "Server error", "errMessage": err });
+            return;
+        } else {
+            Account.findOne({ 'username': newArticle.user }, function (err, account) {
+                if (!account) {
+                    res.json({ "message": "Unknown user", "errMessage": "No user with the email could be found." })
+                    return;
+                } else if (err) {
+                    res.json({ "message": "Server error", "errMessage": err });
+                    return;
+                } else {
+                    account.articles.push(newArticle);
+                    account.save();
+                    Team.findOne({ 'id': newArticle.teamID }, function (err, team) {
+                        if (!team) {
+                            res.json({ "message": "Unknown team", "errMessage": "This team could not be found." })
+                            return;
+                        } else if (err) {
+                            res.json({ "message": "Server error", "errMessage": err });
+                            return;
+                        } else {
+                            team.articles.push(newArticle);
+                            team.save();
+
+                            newArticle.save(function (err) {
+                                if (err) {
+                                    res.json({ "message": "Server error", "errMessage": err });
+                                    return;
+                                } else res.json({ "message": "Article saved", "result": "saved" });
+                            });
+                        }
+                    });
+                }
+            });
+        }
+    });
+});
 module.exports = router;
