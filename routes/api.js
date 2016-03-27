@@ -16,10 +16,10 @@ router.get('/auth/register', function (req, res) {
         if (err) return res.json({ "message": "Error creating account", "errMessage": err })
         else {
             passport.authenticate('local')(req, res, function () {
-            req.session.authenticated = true; 
-            res.json({ "message": "Login and Registration Successful!" }); 
+                req.session.authenticated = true;
+                res.json({ "message": "Login and Registration Successful!" });
             })
-
+        }
     });
 });
 
