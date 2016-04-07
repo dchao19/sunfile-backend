@@ -46,6 +46,13 @@ router.get('/', function (req, res) {
     res.json({ "message": "API v1 OK!" });
 });
 
+router.get('/sources', function(req,res){
+    res.json({"message": "success", "result": {
+        "sources": utils.sources,
+        "sourcesFullName": utils.sourcesFullName
+    }})
+})
+
 router.get('/auth/register', function (req, res) {
     Account.register(new Account({ username: req.query.username, firstName: req.query.firstname, lastName: req.query.lastname }), req.query.password, function (err, account) {
         if (err) return res.json({ "message": "Error creating account", "errMessage": err })
