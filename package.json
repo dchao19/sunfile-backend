@@ -1,32 +1,31 @@
 {
-  "name": "OpenShift-Sample-App",
-  "version": "1.0.0",
-  "description": "OpenShift Sample Application",
+  "name": "Sunfile API",
+  "version": "1.1.0",
+  "description": "The backend powering the Sunfile chrome extension.",
   "keywords": [
-    "OpenShift",
-    "Node.js",
-    "application",
-    "openshift"
+    "Sunfile",
+    "extemp",
+    "KDS"
   ],
   "author": {
-    "name": "OpenShift",
-    "email": "ramr@example.org",
-    "url": "http://www.openshift.com/"
+    "name": "Daniel Chao",
+    "email": "daniel@danielchao.me",
+    "url": "https://danielchao.me"
   },
-  "homepage": "http://www.openshift.com/",
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/openshift/origin-server"
-  },
+  "homepage": "https://sunfile.danielchao.me",
   "engines": {
     "node": ">= 0.6.0",
     "npm": ">= 1.0.0"
   },
   "dependencies": {
+    "async": "^2.0.0-rc.2",
     "body-parser": "^1.15.0",
     "connect-mongo": "^1.1.0",
+    "cors": "^2.7.1",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
+    "just.randomcolor": "^0.1.1",
+    "moment": "^2.12.0",
     "mongoose": "^4.4.9",
     "mongoose-timestamp": "^0.5.0",
     "morgan": "^1.7.0",

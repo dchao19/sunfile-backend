@@ -16,7 +16,7 @@ var session = require('express-session');
 var MongoStore = require('connect-mongo/es5')(session);
 
 var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
-var port = process.env.OPENSHIFT_NODEJS_PORT || 8080;
+var port = process.env.OPENSHIFT_NODEJS_PORT || 8081;
 
 mongoose.connect(dbConfig.url, function (err) {
     if (err) throw err;
@@ -40,7 +40,7 @@ app.use(session({
     saveUninitialized: false,
     resave: false,
     cookie: {
-        secure: false,
+        secure: true,
         maxAge: 14 * 24 * 60 * 60 * 1000 
     }
 }));
