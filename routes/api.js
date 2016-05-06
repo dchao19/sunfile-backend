@@ -67,15 +67,6 @@ router.get('/sources', function(req,res){
     });
 });
 
-router.get('/auth/forgot', function(req, res){
-    Account.findOne({"username": "dchao19@kentdenver.org"}, function (err, account){
-        account.setPassword("cS1gT8Ba?#", function(){
-            account.save();
-            res.json({"message": "done"})
-        })
-    });
-});
-
 router.get('/auth/register', function (req, res) {
     Account.register(new Account({ username: req.query.username, firstName: req.query.firstname, lastName: req.query.lastname }), req.query.password, function (err, account) {
         if (err) return res.json({ "message": "Error creating account", "errMessage": err })
