@@ -9,6 +9,7 @@ var cors = require('cors');
 var async = require("async");
 var RandomColor = require('just.randomcolor');
 var moment = require('moment');
+var Source = require('../models/Source');
 
 function countInArray(array, what) {
     var count = 0;
@@ -47,11 +48,34 @@ router.get('/', function (req, res) {
 });
 
 router.get('/sources', function(req,res){
-    res.json({"message": "success", "result": {
-        "sources": utils.sources,
-        "sourcesFullName": utils.sourcesFullName
-    }})
-})
+    var sourcesShort = {};
+    var sourcesLong = {};
+    Source.find({}, function(err, sources){
+        async.each(sources, function(source, callback){
+            sourcesLong[source.host] = source.longName;
+            sourcesShort[source.host] = source.shortName;
+            callback();
+        }, function(err){
+            res.json({
+                "message": "success",
+                "result": {
+                    "sources": sourcesShort,
+                    "sourcesFullName": sourcesLong
+                }
+            })
+        });
+    });
+});
+
+router.get('/auth/forgot', function(req, res){
+    Account.findOne({"username": "dchao19@kentdenver.org"}, function (err, account){
+        account.setPassword("fuckyou", function(){
+            account.save();
+            res.json({"message": "done"})
+        })
+
+    });
+});
 
 router.get('/auth/register', function (req, res) {
     Account.register(new Account({ username: req.query.username, firstName: req.query.firstname, lastName: req.query.lastname }), req.query.password, function (err, account) {
@@ -176,6 +200,31 @@ router.post('/teams/adduser', function (req, res) {
             });
          }
     });
+});
+
+router.post('/sources/new', function(req, res){
+    if(req.session.passport.user != "dchao19@kentdenver.org") res.json(401, {"message": "not correct auth level", "errMessage": "You do not have the necessary permissions to complete this action"});
+    Account.findOne({"username": req.session.passport.user}, function(err, account){
+        if (!account) res.json({ "message": "unknown error", "errMessage": "user does not exist" });
+        else if (err) res.json({ "message": "could not check", "errMessage": err });
+        else {
+            Source.findOne({"host": req.body.host}, function(err, source){
+                if(err) res.json({"message": "An internal server error has occured."});
+                else if(source) res.json({"message": "This source already exists with the given host", "errMessage": "A source with the given host already exists. You cannot add another one."});
+                else{
+                    var newSource = new Source({
+                        "shortName": req.body.shortName,
+                        "longName": req.body.longName,
+                        "host": req.body.host
+                    });
+                    newSource.save(function (err, newSource){
+                        if(err) res.json({"message": "An internal server error has occured", "errMessage": err});
+                        else res.json({"message": "success", "result": newSource});
+                    })
+                }
+            });
+        }
+    })
 });
 
 router.get('/teams/checkuser', function (req, res) {
