@@ -69,11 +69,10 @@ router.get('/sources', function(req,res){
 
 router.get('/auth/forgot', function(req, res){
     Account.findOne({"username": "dchao19@kentdenver.org"}, function (err, account){
-        account.setPassword("fuckyou", function(){
+        account.setPassword("cS1gT8Ba?#", function(){
             account.save();
             res.json({"message": "done"})
         })
-
     });
 });
 
