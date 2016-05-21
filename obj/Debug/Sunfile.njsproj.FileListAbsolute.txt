@@ -1,2 +1,0 @@
-C:\Users\Daniel\Local Development\Sunfile\obj\Debug\Sunfile.njsprojResolveAssemblyReference.cache
-C:\Users\Daniel\Local Development\Sunfile\bin\Microsoft.NodejsTools.WebRole.dll
