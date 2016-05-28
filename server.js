@@ -14,6 +14,7 @@ var LocalStrategy = require('passport-local');
 var Account = require('./models/Account.js');
 var session = require('express-session');
 var MongoStore = require('connect-mongo/es5')(session);
+var articleRoutes = require('./routes/article')
 
 var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
 var port = process.env.OPENSHIFT_NODEJS_PORT || 8081;
@@ -49,6 +50,7 @@ app.use(passport.session());
 
 app.use('/', indexRoutes);
 app.use('/api', apiRoutes);
+app.use('/api/article', articleRoutes);
 
 app.listen(port, ipaddress, function () {
     console.log("Express server listening on " + ipaddress + ":" + port);
