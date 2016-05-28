@@ -31,3 +31,5 @@ router.post('/article_content', function (req, res) {
         });
     }
 });
+
+module.exports = router;
