@@ -225,7 +225,7 @@ router.post('/teams/adduser', function(req, res) {
 });
 
 router.post('/sources/new', function(req, res) {
-    if (req.session.passport.user === "dchao19@kentdenver.org") {
+    if (req.session.passport.user === "danielchao") {
         Account.findOne({username: req.session.passport.user}, function(err, account) {
             if (!account) {
                 res.json({message: "unknown error", errMessage: "user does not exist"});
