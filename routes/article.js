@@ -1,6 +1,7 @@
 var express = require('express');
 var apiKeys = require('../utils/apiKeys');
 var apiHelpers = require('../utils/apiHelpers');
+var apiUrls = require('../utils/apiUrls');
 var router = express.Router();
 
 router.use(function(req, res, next) {
@@ -15,7 +16,7 @@ router.post('/content', function(req, res) {
     req.accepts('html'); // The easiest way to not break the formatting of JSON is by directly POSTing the HTML content of page. Potentially insecure.
 
     if (req.body) { // Confirm HTML data was sent in the request
-        apiHelpers.watsonRequestFactory("https://gateway-a.watsonplatform.net/calls/html/HTMLGetCombinedData", // Generate combined call to Watson to gather metadaat about article
+        apiHelpers.watsonRequestFactory(apiUrls.COMBINED, // Generate combined call to Watson to gather metadaat about article
             {
                 apikey: apiKeys.alchemy,
                 html: req.body,
@@ -23,7 +24,7 @@ router.post('/content', function(req, res) {
                 outputMode: "json"
             },
             function(metadata) {
-                apiHelpers.watsonRequestFactory("https://gateway-a.watsonplatform.net/calls/html/HTMLGetText", // The combined call doesn't provide the text extraction - I need to do it again
+                apiHelpers.watsonRequestFactory(apiUrls.TEXT, // The combined call doesn't provide the text extraction - I need to do it again
                     {
                         apikey: apiKeys.alchemy,
                         html: req.body,
