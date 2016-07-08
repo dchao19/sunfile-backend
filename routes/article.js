@@ -1,6 +1,6 @@
 var express = require('express');
 var apiKeys = require('../utils/apiKeys');
-var watsonApi = require('../utils/watsonapi');
+var apiHelpers = require('../utils/apiHelpers');
 var router = express.Router();
 
 router.use(function(req, res, next) {
@@ -15,7 +15,7 @@ router.post('/content', function(req, res) {
     req.accepts('html'); // The easiest way to not break the formatting of JSON is by directly POSTing the HTML content of page. Potentially insecure.
 
     if (req.body) { // Confirm HTML data was sent in the request
-        watsonApi.watsonRequestFactory("https://gateway-a.watsonplatform.net/calls/html/HTMLGetCombinedData", // Generate combined call to Watson to gather metadaat about article
+        apiHelpers.watsonRequestFactory("https://gateway-a.watsonplatform.net/calls/html/HTMLGetCombinedData", // Generate combined call to Watson to gather metadaat about article
             {
                 apikey: apiKeys.alchemy,
                 html: req.body,
@@ -23,7 +23,7 @@ router.post('/content', function(req, res) {
                 outputMode: "json"
             },
             function(metadata) {
-                watsonApi.watsonRequestFactory("https://gateway-a.watsonplatform.net/calls/html/HTMLGetText", // The combined call doesn't provide the text extraction - I need to do it again
+                apiHelpers.watsonRequestFactory("https://gateway-a.watsonplatform.net/calls/html/HTMLGetText", // The combined call doesn't provide the text extraction - I need to do it again
                     {
                         apikey: apiKeys.alchemy,
                         html: req.body,
@@ -33,11 +33,11 @@ router.post('/content', function(req, res) {
                         if (metadata.error || content.error || !content.body.text) { // If there is an error or no content was returned from the text extraction, error 500 and don't continue
                             res.json(500, {message: "Server error", errMessage: "An unexpected server error has occured."});
                         } else {
-                            watsonApi.parseKeywords(metadata.body.keywords, [], 0, function(keywords) { // Node can't do sync loops so we do this method recursively and callback when complete
+                            apiHelpers.parseKeywords(metadata.body.keywords, [], 0, function(keywords) { // Node can't do sync loops so we do this method recursively and callback when complete
                                 res.json({
                                     message: "success",
                                     result: {
-                                        paragraphs: watsonApi.parseParagraphs(content.body.text), // The templater expects the paragraphs to be arrays of key/value pairs
+                                        paragraphs: apiHelpers.parseParagraphs(content.body.text), // The templater expects the paragraphs to be arrays of key/value pairs
                                         title: metadata.body.title,
                                         keywords: keywords,
                                         author: metadata.body.authors.names[0],
