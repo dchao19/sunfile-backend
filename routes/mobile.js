@@ -1,5 +1,20 @@
 var express = require('express');
 var router = express.Router();
+var cors = require('cors');
+
+
+router.use(cors({
+    origin: ["null", "http://localhost:8081"],
+    credentials: true,
+    methods: ['GET', 'POST']
+}));
+
+router.options('*', cors({
+    origin: ["null", "http://localhost:8081"],
+    credentials: true,
+    methods: ['GET', 'POST']
+}));
+
 
 router.get('/featured_sources', function(req, res) {
     res.json({
