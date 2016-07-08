@@ -1,6 +1,6 @@
 var unirest = require('unirest');
 
-var watsonapi = {
+var apiHelpers = {
     watsonRequestFactory: function(url, data, callback) {
         var request = unirest("POST", url);
         request.headers({
@@ -28,4 +28,4 @@ var watsonapi = {
     }
 };
 
-module.exports = watsonapi;
+module.exports = apiHelpers;
