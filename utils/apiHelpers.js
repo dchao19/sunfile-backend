@@ -1,4 +1,5 @@
 var unirest = require('unirest');
+var apiKeys = require('./apiKeys');
 
 var apiHelpers = {
     watsonRequestFactory: function(url, data, callback) {
@@ -25,6 +26,16 @@ var apiHelpers = {
         }
 
         this.parseKeywords(keywords, newKeywords, currentIndex + 1, callback);
+    },
+    aylienRequestFactory: function(url, data, callback) {
+        var request = unirest("POST", url);
+        request.headers({
+            "Content-Type": "application/x-www-form-urlencoded",
+            "X-AYLIEN-TextAPI-Application-Key": apiKeys.aylien.key,
+            "X-AYLIEN-TextAPI-Application-ID": apiKeys.aylien.appId
+        });
+        request.form(data);
+        request.end(callback);
     }
 };
 
