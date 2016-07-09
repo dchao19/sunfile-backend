@@ -1,6 +1,7 @@
 var express = require('express');
 var apiKeys = require('../utils/apiKeys');
-var watsonApi = require('../utils/watsonapi');
+var apiHelpers = require('../utils/apiHelpers');
+var apiUrls = require('../utils/apiUrls');
 var router = express.Router();
 
 router.use(function(req, res, next) {
@@ -15,7 +16,7 @@ router.post('/content', function(req, res) {
     req.accepts('html'); // The easiest way to not break the formatting of JSON is by directly POSTing the HTML content of page. Potentially insecure.
 
     if (req.body) { // Confirm HTML data was sent in the request
-        watsonApi.watsonRequestFactory("https://gateway-a.watsonplatform.net/calls/html/HTMLGetCombinedData", // Generate combined call to Watson to gather metadaat about article
+        apiHelpers.watsonRequestFactory(apiUrls.COMBINED, // Generate combined call to Watson to gather metadaat about article
             {
                 apikey: apiKeys.alchemy,
                 html: req.body,
@@ -23,7 +24,7 @@ router.post('/content', function(req, res) {
                 outputMode: "json"
             },
             function(metadata) {
-                watsonApi.watsonRequestFactory("https://gateway-a.watsonplatform.net/calls/html/HTMLGetText", // The combined call doesn't provide the text extraction - I need to do it again
+                apiHelpers.watsonRequestFactory(apiUrls.TEXT, // The combined call doesn't provide the text extraction - I need to do it again
                     {
                         apikey: apiKeys.alchemy,
                         html: req.body,
@@ -33,15 +34,16 @@ router.post('/content', function(req, res) {
                         if (metadata.error || content.error || !content.body.text) { // If there is an error or no content was returned from the text extraction, error 500 and don't continue
                             res.json(500, {message: "Server error", errMessage: "An unexpected server error has occured."});
                         } else {
-                            watsonApi.parseKeywords(metadata.body.keywords, [], 0, function(keywords) { // Node can't do sync loops so we do this method recursively and callback when complete
+                            apiHelpers.parseKeywords(metadata.body.keywords, [], 0, function(keywords) { // Node can't do sync loops so we do this method recursively and callback when complete
                                 res.json({
                                     message: "success",
                                     result: {
-                                        paragraphs: watsonApi.parseParagraphs(content.body.text), // The templater expects the paragraphs to be arrays of key/value pairs
+                                        paragraphs: apiHelpers.parseParagraphs(content.body.text), // The templater expects the paragraphs to be arrays of key/value pairs
                                         title: metadata.body.title,
                                         keywords: keywords,
                                         author: metadata.body.authors.names[0],
-                                        pubDate: metadata.body.publicationDate.date
+                                        pubDate: metadata.body.publicationDate.date,
+                                        text: content.body.text
                                     }
                                 });
                             });
@@ -52,6 +54,30 @@ router.post('/content', function(req, res) {
         );
     } else {
         res.json(400, {message: "Missing data", errMessage: "No data was received from the request."}); // This endpoint cannot proceed without html content from the request
+    }
+});
+
+router.post('/summary', function(req, res) {
+    if (req.body.title && req.body.text) {
+        apiHelpers.aylienRequestFactory(apiUrls.SUMMARY,
+            {
+                title: req.body.title,
+                text: req.body.text,
+                sentences_number: 3
+            }, function(content) {
+                var summary = content.body.sentences.map(function(sentence) {
+                    return {sentence: sentence};
+                });
+                res.json({
+                    message: 'success',
+                    result: {
+                        summary: summary
+                    }
+                });
+            }
+        );
+    } else {
+        res.status(400).json({message: 'Missing data', errMessage: "Either the title or the text field was not sent with the request. These are required parameters."});
     }
 });
 
