@@ -33,7 +33,7 @@ passport.deserializeUser(Account.deserializeUser());
 var app = express();
 app.use(logger('dev'));
 app.use(bodyParser.json());
-app.use(bodyParser.text({type: 'html'}));
+app.use(bodyParser.text({type: 'html', limit: '50mb'}));
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'views')));
 app.use(session({
