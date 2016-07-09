@@ -31,13 +31,13 @@ Array.prototype.indexOfObject = function arrayObjectIndexOf(property, value) {
 
 
 router.use(cors({
-    origin: ["null", "http://localhost:8080"],
+    origin: ["null", "http://localhost:8081"],
     credentials: true,
     methods: ['GET', 'POST']
 }));
 
 router.options('*', cors({
-    origin: ["null", "http://localhost:8080"],
+    origin: ["null", "http://localhost:8081"],
     credentials: true,
     methods: ['GET', 'POST']
 }));
