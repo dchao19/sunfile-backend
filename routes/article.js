@@ -42,7 +42,8 @@ router.post('/content', function(req, res) {
                                         title: metadata.body.title,
                                         keywords: keywords,
                                         author: metadata.body.authors.names[0],
-                                        pubDate: metadata.body.publicationDate.date
+                                        pubDate: metadata.body.publicationDate.date,
+                                        text: content.body.text
                                     }
                                 });
                             });
@@ -53,6 +54,30 @@ router.post('/content', function(req, res) {
         );
     } else {
         res.json(400, {message: "Missing data", errMessage: "No data was received from the request."}); // This endpoint cannot proceed without html content from the request
+    }
+});
+
+router.post('/summary', function(req, res) {
+    if (req.body.title && req.body.text) {
+        apiHelpers.aylienRequestFactory(apiUrls.SUMMARY,
+            {
+                title: req.body.title,
+                text: req.body.text,
+                sentences_number: 3
+            }, function(content) {
+                var summary = content.body.sentences.map(function(sentence) {
+                    return {sentence: sentence};
+                });
+                res.json({
+                    message: 'success',
+                    result: {
+                        summary: summary
+                    }
+                });
+            }
+        );
+    } else {
+        res.status(400).json({message: 'Missing data', errMessage: "Either the title or the text field was not sent with the request. These are required parameters."});
     }
 });
 
