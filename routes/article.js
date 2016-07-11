@@ -4,13 +4,13 @@ var apiHelpers = require('../utils/apiHelpers');
 var apiUrls = require('../utils/apiUrls');
 var router = express.Router();
 
-router.use(function(req, res, next) {
-    if (!req.session || !req.session.authenticated) {
-        res.json(401, {message: "Unauthorized!", errMessage: "You are not logged in with the correct credientals to preform this action / your cookie could have expired!"});
-    } else {
-        next();
-    }
-});
+// router.use(function(req, res, next) {
+//     if (!req.session || !req.session.authenticated) {
+//         res.json(401, {message: "Unauthorized!", errMessage: "You are not logged in with the correct credientals to preform this action / your cookie could have expired!"});
+//     } else {
+//         next();
+//     }
+// });
 
 router.post('/content', function(req, res) {
     req.accepts('html'); // The easiest way to not break the formatting of JSON is by directly POSTing the HTML content of page. Potentially insecure.
