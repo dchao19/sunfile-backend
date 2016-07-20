@@ -18,7 +18,7 @@ var articleRoutes = require('./routes/article');
 var mobileRoutes = require('./routes/mobile');
 
 var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
-var port = process.env.port || 3000;
+var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 
 mongoose.connect(dbConfig.url, function (err) {
     if (err) throw err;
