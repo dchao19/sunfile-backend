@@ -32,7 +32,6 @@ mongoose.connect(dbConfig.url, function(err) {
 });
 mongoose.Promise = global.Promise;
 
-
 var app = express();
 app.use(logger('dev'));
 app.use(bodyParser.json());

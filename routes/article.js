@@ -48,7 +48,7 @@ router.post('/content', function(req, res) {
                                         result: {
                                             paragraphs: apiHelpers.parseParagraphs(content.body.text), // The templater expects the paragraphs to be arrays of key/value pairs
                                             title: metadata.body.title,
-                                        keywords,
+                                            keywords,
                                             author: metadata.body.authors.names[0],
                                             pubDate: metadata.body.publicationDate.date,
                                             text: content.body.text
