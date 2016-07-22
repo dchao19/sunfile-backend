@@ -50,7 +50,7 @@
   },
   "bundleDependencies": [],
   "private": true,
-  "main": "server.js",
+  "main": "start.js",
   "scripts": {
     "start": "node start.js",
     "babel-node": "babel-node"

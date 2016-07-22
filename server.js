@@ -61,6 +61,8 @@ app.use('/api/info', infoRoutes);
 app.use('/api/mobile', mobileRoutes);
 app.use('/api/article', articleRoutes);
 
-app.listen(port);
+app.listen(port, ipaddress, () => {
+    console.log("Express server listening on " + ipaddress + ":" + port);
+});
 
 module.exports = app;
