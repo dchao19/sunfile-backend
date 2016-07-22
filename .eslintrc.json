@@ -1,5 +1,9 @@
 {
     "extends": "google",
+    "parser": "babel-eslint",
+    "plugins": [
+        "babel"
+    ],
     "rules": {
         "new-cap": 0,
         "indent": [2, 4],
@@ -7,6 +11,17 @@
         "operator-linebreak": 0,
         "no-else-return": 0,
         "max-len": 0,
-        "linebreak-style": 0
+        "linebreak-style": 0,
+        "generator-star-spacing": 0,
+        "arrow-parens": 0,
+        "babel/generator-star-spacing": 1,
+        "babel/new-cap": 1,
+        "babel/array-bracket-spacing": 1,
+        "babel/object-curly-spacing": 1,
+        "babel/object-shorthand": 1,
+        "babel/arrow-parens": 1,
+        "babel/no-await-in-loop": 1,
+        "babel/flow-object-type": 1,
+        "babel/func-params-comma-dangle": 1
     }
 }
