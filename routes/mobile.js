@@ -27,42 +27,48 @@ router.get('/featured_sources', function(req, res) {
                     tags: ["international", "bipartisan", "long"],
                     detail: "Uncomprising analysis of critical global trends and international policy.",
                     short: "WPR",
-                    feedUrl: "http://feeds.feedburner.com/worldpoliticsreview"
+                    feedUrl: "http://feeds.feedburner.com/worldpoliticsreview",
+                    icon: "https://www.worldpoliticsreview.com/Images/Favicon/favicon-96x96.png"
                 },
                 {
                     title: "Foreign Policy Magazine",
                     tags: ["international", "indepth"],
                     detail: "Magazine of global politics, economics and ideas",
                     short: "FP",
-                    feedUrl: "http://foreignpolicy.com/feed"
+                    feedUrl: "http://foreignpolicy.com/feed",
+                    icon: "https://pbs.twimg.com/profile_images/560557786350637057/GXv25iue.png"
                 },
                 {
                     title: "Wall Street Journal - World",
                     tags: ["fast", "easyread", "global"],
                     detail: "Top stories, photos, videos, detailed analysis and in-depth coverage",
                     short: "WSJ",
-                    feedUrl: "http://online.wsj.com/xml/rss/3_7085.xml"
+                    feedUrl: "http://online.wsj.com/xml/rss/3_7085.xml",
+                    icon: "http://www.wsj.com/apple-touch-icon.png"
                 },
                 {
                     title: "The Diplomat",
                     tags: ["asia-pacific", "complex", "long"],
                     detail: "Read The Diplomat. Know the Asia-Pacific",
                     short: "Dpl",
-                    feedUrl: "http://thediplomat.com/feed/atom/"
+                    feedUrl: "http://thediplomat.com/feed/atom/",
+                    icon: "http://www.postwesternworld.com/images/2015/03/TheDiplomat.png"
                 },
                 {
                     title: "DipNote",
                     tags: ["official", "usstate", "international"],
                     detail: "The United States Secretary of State Official Blog",
                     short: "Dpn",
-                    feedUrl: "http://feeds.feedburner.com/dipnote"
+                    feedUrl: "http://feeds.feedburner.com/dipnote",
+                    icon: "http://www.humanrights.gov/images/dipnote-90x90.jpg"
                 },
                 {
                     title: "The Council on Foreign Relations",
                     tags: ["official", "international"],
                     detail: "Think tank specializing in U.S. foreign policy and international affairs.",
                     short: "CFR",
-                    feedUrl: "http://feeds.cfr.org/cfr_main"
+                    feedUrl: "http://feeds.cfr.org/cfr_main",
+                    icon: "https://media.glassdoor.com/sqll/31810/council-on-foreign-relations-squarelogo.png"
                 }
             ]
         },
