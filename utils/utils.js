@@ -1,103 +1,83 @@
-﻿var utils = {
-    generateRandomTeamCode: function (){
+﻿var Team = require('../models/Team');
+var async = require('async');
+var unirest = require('unirest');
+var apiUrls = require('../utils/apiUrls');
+var apiKeys = require('../utils/apiKeys');
+
+class utils {
+    generateRandomTeamCode() {
         var selectables = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
         var teamCode = "";
         for (var i = 0; i < 6; i++) {
             teamCode += selectables.charAt(Math.floor(Math.random() * 35));
         }
         return teamCode;
-    },
-    sources: {
-      nytimes:  "NYT",
-      brookings:  "Brk",
-      worldpoliticsreview:  "WPR",
-      "ap.org":  "AP",
-      carnegie:  "CE",
-      foreignpolicy:  "FP",
-      diplomat:  "Dpl",
-      foreignaffairs:  "FA",
-      hir:  "HIR",
-      harvardpolitics:  "HPR",
-      politico:  "Pol",
-      reuters:  "Rt",
-      wsj:  "WSJ",
-      mercopress:  "MP",
-      economist:  "Eco",
-      moscowtimes:  "MT",
-      heritage:  "HF",
-      cnn:  "CNN",
-      csis:  "CS",
-      aljazeera:  "AJ",
-      cfr:  "CFR",
-      "blogs.state.gov":  "DPN",
-      theatlantic:  "Atl",
-      washingtonpost:  "WP",
-      usatoday:  "USAT",
-      thehill:  "H",
-      chathamhouse:  "CH",
-      bbc:  "BBC",
-      npr:  "NPR",
-      businessinsider:  "BI",
-      andina:  "AN",
-      laht:  "LH",
-      businessweek:  "Blm",
-      usip:  "IP",
-      newsweek:  "Nw",
-      alhayat:  "AH",
-      japantimes:  "JT",
-      defensenews:  "DN",
-      bloomberg: "Blm",
-      amnesty: "Am",
-      pewresearch: "PRC" ,
-      piie: "PI",
-      csmonitor: "CSM"     
-	},
-
-	sourcesFullName: {
-      nytimes:  "New York Times",
-      brookings:  "Brookings Institute",
-      worldpoliticsreview:  "World Politics Review",
-      "ap.org":  "Associated Press",
-      carnegie:  "Carnegie Endowment for International Peace",
-      foreignpolicy:  "Foreign Policy Magazine",
-      diplomat:  "The Diplomat",
-      foreignaffairs:  "Foreign Affairs",
-      hir:  "Harvard International Review",
-      harvardpolitics:  "Harvard Politics Review",
-      politico:  "Politico",
-      reuters:  "Reuters Wire Service",
-      wsj:  "Wall Street Journal",
-      mercopress:  "MercoPress",
-      economist:  "The Economist",
-      moscowtimes:  "Moscow Times",
-      heritage:  "The Heritage Foundation",
-      cnn:  "CNN",
-      csis:  "Center for Strategic and International Studies",
-      aljazeera:  "Al Jazeera America",
-      cfr:  "Council for Foreign Relations",
-      "blogs.state.gov":  "U.S. Secretary of State Official Blog (DipNote)",
-      theatlantic:  "The Atlantic",
-      washingtonpost:  "The Washington Post",
-      usatoday:  "USA Today",
-      thehill:  "The Hill",
-      chathamhouse:  "Chatham House (The Royal Institute of International Affairs)",
-      bbc:  "BBC",
-      npr:  "National Public Radio",
-      businessinsider:  "Business Insider",
-      andina:  "AN",
-      laht:  "Latin American Herald Tribune",
-      businessweek:  "Bloomberg Businessweek",
-      usip:  "United States Institute of Peace",
-      newsweek:  "Newsweek",
-      alhayat:  "AH",
-      japantimes:  "Japan Times",
-      defensenews:  "Defense News",
-      bloomberg: "Bloomberg",
-      amnest: "Amnesty International",
-      pewresearch: "Pew Research Center",
-      piie: "Peterson Institute for International Economics",
-      csmonitor: "Christian Science Monitor"
-	}
+    }
+    whileNotUnique(teamCode) {
+        return new Promise(async (resolve, reject) => {
+            let team = await Team.findOne({id: teamCode});
+            if (team) {
+                reject(false);
+            } else {
+                resolve(true);
+            }
+        });
+    }
+    async generateAndVerifyTeamCode() {
+        return new Promise(async (resolve) => {
+            let unique = false;
+            while (!unique) {
+                let teamCode = this.generateRandomTeamCode();
+                unique = this.whileNotUnique(teamCode)
+                .then((result) => {
+                    return result;
+                })
+                .then(() => {
+                    resolve(teamCode);
+                })
+                .catch((result) => {
+                    return result;
+                });
+            }
+        });
+    }
+    async updateUserTeamCode(userID, teamCode) {
+        return new Promise(async (resolve, reject) => {
+            unirest.patch(apiUrls.USER + "/" + userID)
+            .headers({
+                'Authorization': 'Bearer ' + apiKeys.authUserUpdate,
+                'Content-Type': 'application/json'
+            })
+            .type('json')
+            .send({
+                user_metadata: { // eslint-disable-line
+                    teamCode
+                }
+            })
+            .end((response) => {
+                if (response.code === 200) {
+                    console.log(response.body);
+                    resolve(response.body);
+                } else {
+                    console.log(response.body);
+                    reject(response.body);
+                }
+            });
+        });
+    }
+    async incrementNumArticles(users, email) {
+        return new Promise((resolve) => {
+            let newUsers = users;
+            async.eachOf(newUsers, (user, index, done) => {
+                if (user.email === email) {
+                    newUsers[index].numArticles++;
+                }
+                done();
+            }, () => {
+                resolve(newUsers);
+            });
+        });
+    }
 }
 
 module.exports = utils;
