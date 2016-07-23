@@ -8,6 +8,7 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 var session = require('express-session');
 var MongoStore = require('connect-mongo/es5')(session);
+var cors = require('cors');
 
 var indexRoutes = require('./routes/index.js');
 var apiRoutes = require('./routes/api.js');
@@ -51,6 +52,12 @@ app.use(session({
 }));
 app.use(passport.initialize());
 app.use(passport.session());
+app.use(cors({
+    origin: true,
+    credentials: true,
+    methods: ['GET', 'POST']
+}));
+
 
 app.use('/', indexRoutes);
 app.use('/api', apiRoutes);
