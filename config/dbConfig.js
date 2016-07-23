@@ -2,7 +2,7 @@
 // if OPENSHIFT env variables are present, use the available connection info:
 if (process.env.SUNFILE_DB_PASSWORD) {
     connectionString = process.env.SUNFILE_DB_USERNAME + ":" + process.env.SUNFILE_DB_PASSWORD + "@" +
-    'mongo.danielchao.me:27017/sunfile';
+    'mongo.danielchao.me:27017/sunfile-beta';
 }
 
 module.exports = {
