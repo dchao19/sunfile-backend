@@ -15,9 +15,22 @@ router.get('/callback',
 
 router.get('/verify', function(req, res) {
     if (req.isAuthenticated()) {
-        res.json({message: "auth looks good!", result: req.user});
+        res.json({
+            success: true,
+            message: 'success',
+            result: {
+                authenticated: false,
+                user: req.user
+            }
+        });
     } else {
-        res.json({message: "auth no good."});
+        res.json({
+            success: true,
+            message: 'success',
+            result: {
+                authenticated: false
+            }
+        });
     }
 });
 
