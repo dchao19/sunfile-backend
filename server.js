@@ -34,6 +34,7 @@ mongoose.connect(dbConfig.url, function(err) {
 mongoose.Promise = global.Promise;
 
 var app = express();
+app.set('view engine', 'pug');
 app.use(logger('dev'));
 app.use(bodyParser.json());
 app.use(bodyParser.text({type: 'html', limit: '50mb'}));
@@ -57,7 +58,6 @@ app.use(cors({
     credentials: true,
     methods: ['GET', 'POST']
 }));
-
 
 app.use('/', indexRoutes);
 app.use('/api', apiRoutes);
