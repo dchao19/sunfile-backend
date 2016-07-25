@@ -62,15 +62,19 @@ router.get('/stats', async function (req, res) {
             success: true,
             message: 'success',
             result: {
-                infoStats: {
+                userInfo: {
                     myNumArticles: userArticles.length,
                     teamNumArticles: teamArticles.length
                 },
-                mySourcesPie: userCharts.pie,
-                myArticlesLine: userCharts.line,
+                userSourcesPie: userCharts.pie,
+                userArticlesLine: userCharts.line,
                 teamSourcesPie: teamCharts.pie,
                 teamArticlesLine: teamCharts.line,
-                teamStats: team.users
+                teamInfo: {
+                    name: team.schoolName,
+                    code: team.id,
+                    users: team.users
+                }
             }
         });
     } catch (e) {
