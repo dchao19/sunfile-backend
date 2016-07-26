@@ -14,17 +14,15 @@ class StatUtils {
     }
     async generateChartLabels() {
         return new Promise((resolve) => {
-            let today = moment(new Date()).date();
-
+            let today = moment();
+            let todaysDate = today.date();
             let labels = [];
-            for (var i = 1; i <= today + 1; i++) {
-                if (i === 1 || i % 5 === 0) {
-                    labels.push(moment().format("MMMM") + " " + i);
-                } else {
-                    labels.push("");
-                }
+            for (var i = 1; i <= todaysDate + 1; i++) {
+                let day = moment(today);
+                day.date(i);
+                labels.push(day.format('MMM D'));
 
-                if (i === today + 1) {
+                if (i === todaysDate + 1) {
                     resolve(labels);
                 }
             }
