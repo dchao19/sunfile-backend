@@ -1,4 +1,5 @@
 ﻿var Team = require('../models/Team');
+var Source = require('../models/Source');
 var async = require('async');
 var unirest = require('unirest');
 var apiUrls = require('../utils/apiUrls');
@@ -75,6 +76,34 @@ class utils {
                 done();
             }, () => {
                 resolve(newUsers);
+            });
+        });
+    }
+    findFileCodes(url) {
+        return new Promise(async (resolve) => {
+            let sources = await Source.find({});
+            let foundSource = {};
+            async.each(sources, (source, done) => {
+                if (url.includes(source.host)) {
+                    foundSource = source;
+                }
+                done();
+            }, () => {
+                resolve(foundSource);
+            });
+        });
+    }
+    checkDuplicate(articles, articleToCheck) {
+        return new Promise((resolve) => {
+            let found = false;
+            async.each(articles, (article, done) => {
+                if (article.longPublication === articleToCheck.longPublication &&
+                    article.title === articleToCheck.title) {
+                    found = true;
+                }
+                done();
+            }, () => {
+                resolve(found);
             });
         });
     }

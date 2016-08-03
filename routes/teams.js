@@ -68,14 +68,12 @@ router.post('/join', async function(req, res) {
         }
 
         await utils.updateUserTeamCode(req.user.id, req.body.teamCode);
-        console.log(req.user);
         var userData = new TeamUserData({
             firstName: req.user.name.givenName,
             lastName: req.user.name.familyName,
             numArticles: 0,
             email: req.user.emails[0].value
         });
-        console.log(userData);
         team.users.push(userData);
         team.save();
 

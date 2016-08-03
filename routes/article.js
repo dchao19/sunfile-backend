@@ -8,13 +8,9 @@ var Article = require('../models/Article');
 var Team = require('../models/Team');
 var Utils = require('../utils/utils');
 var utils = new Utils();
-router.use(function(req, res, next) {
-    if (!req.session || !req.session.authenticated) {
-        res.json(401, {message: "Unauthorized!", errMessage: "You are not logged in with the correct credientals to preform this action / your cookie could have expired!"});
-    } else {
-        next();
-    }
-});
+var requiresLogin = require('../utils/requiresLogin');
+
+router.use(requiresLogin);
 
 router.post('/content', function(req, res) {
     req.accepts('html'); // The easiest way to not break the formatting of JSON is by directly POSTing the HTML content of page. Potentially insecure.
@@ -92,15 +88,16 @@ router.post('/summary', function(req, res) {
 
 router.post('/new', async function(req, res) {
     try {
+        let fileCodes = await utils.findFileCodes(req.body.url);
         var newArticle = new Article({
             title: req.body.title,
-            longPublication: req.body.fullPublication,
-            shortPublication: req.body.shortPublication,
-            user: req.user.emails[0].email
+            longPublication: fileCodes.longName,
+            shortPublication: fileCodes.shortName,
+            user: req.user.emails[0].value
         });
 
-        let teamID = typeof req.user._json.user_metadata === 'undefined' ? 'UNDEFINED' : req.user._json.user_metadata;
-        let team = Team.findOne({id: teamID});
+        let teamID = typeof req.user._json.user_metadata === 'undefined' ? 'UNDEFINED' : req.user._json.user_metadata.teamCode;
+        let team = await Team.findOne({id: teamID});
         if (!team) {
             return res.json({
                 success: false,
@@ -109,12 +106,7 @@ router.post('/new', async function(req, res) {
                 errMessage: 'The user\'s team could not be found'
             });
         }
-
-        let duplicateArticle = await Article.findOne({
-            title: req.body.title,
-            longPublication: newArticle.longPublication,
-            teamID
-        });
+        let duplicateArticle = await utils.checkDuplicate(team.articles, newArticle);
 
         if (duplicateArticle) {
             return res.json({
@@ -125,8 +117,14 @@ router.post('/new', async function(req, res) {
             });
         }
 
-        newArticle.save();
-        await utils.incrementNumArticles();
+        team.articles.push(newArticle);
+        team.users = team.users.map((user) => {
+            if (user.email === newArticle.user) {
+                user.numArticles++;
+            }
+            return user;
+        });
+        team.save();
 
         res.json({
             success: true,
