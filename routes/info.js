@@ -54,10 +54,16 @@ router.get('/stats', async function (req, res) {
             });
         }
 
-        let teamArticles = await Article.find({teamID: teamCode});
-        let userArticles = await Article.find({user: req.user.emails[0].value});
-        let userCharts = await statUtils.generateData(userArticles, "My Articles");
-        let teamCharts = await statUtils.generateData(teamArticles, "Team Articles");
+        let teamArticles = team.articles;
+        let userArticles = team.articles.filter((article) => {
+            return article.user === req.user.emails[0].value;
+        });
+
+        let [userCharts, teamCharts] = await Promise.all([
+            statUtils.generateData(userArticles, "My Articles"),
+            statUtils.generateData(teamArticles, "Team Articles")
+        ]);
+
         res.json({
             success: true,
             message: 'success',
