@@ -56,6 +56,7 @@
   "main": "start.js",
   "scripts": {
     "start": "node start.js",
-    "babel-node": "babel-node"
+    "babel-node": "babel-node",
+    "nodemon-start": "nodemon --exec npm run babel-node -- server.js"
   }
 }
