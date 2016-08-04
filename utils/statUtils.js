@@ -31,6 +31,11 @@ class StatUtils {
     async generateData(allArticles, label) {
         return new Promise((resolve) => {
             let sourceData = {};
+            let sourcesNum = {};
+            let sourcesColor = [];
+            let sourcesHighlight = [];
+            let sourcesLabel = [];
+
             let today = moment();
             let articlesOnDays = new Array(today.date() + 1).fill(0);
             async.each(allArticles, (article, done) => {
@@ -39,22 +44,38 @@ class StatUtils {
                     articlesOnDays[articleCreatedDay.date() - 1]++;
                 }
 
-                if (sourceData.hasOwnProperty(article.longPublication)) {
-                    sourceData[article.longPublication].value++;
+                if (sourcesNum.hasOwnProperty(article.longPublication)) {
+                    sourcesNum[article.longPublication]++;
                 } else {
                     var colors = this.generateRandomColor();
-                    sourceData[article.longPublication] = {
-                        color: colors.color,
-                        highlight: colors.highlight,
-                        label: article.shortPublication,
-                        long: article.longPublication,
-                        value: 1
-                    };
+                    sourcesNum[article.longPublication] = 1;
+                    sourcesColor.push(colors.color);
+                    sourcesHighlight.push(colors.highlight);
+                    sourcesLabel.push(article.shortPublication);
+
+                    // sourcesNum[article.longPublication] = {
+                    //     color: colors.color,
+                    //     highlight: colors.highlight,
+                    //     label: article.shortPublication,
+                    //     long: article.longPublication,
+                    //     value: 1
+                    // };
                 }
 
                 done();
             }, async () => {
-                var sourcePie = Object.values(sourceData);
+                let sourcesNumArray = Object.values(sourcesNum);
+                let sourcePie = {
+                    labels: sourcesLabel,
+                    datasets: [
+                        {
+                            label: "My Sources",
+                            data: sourcesNumArray,
+                            backgroundColor: sourcesColor,
+                            hoverBackgroundColor: sourcesHighlight
+                        }
+                    ]
+                };
                 var labels = await this.generateChartLabels();
                 var datasets = [
                     {
