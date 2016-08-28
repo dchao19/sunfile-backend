@@ -9,12 +9,26 @@ var StatUtils = require('../utils/statUtils');
 
 router.use(requiresLogin);
 
-router.get('/user', (req, res) => {
-    res.json({
-        success: true,
-        message: 'success',
-        result: req.user
-    });
+router.get('/user', async (req, res) => {
+    try {
+        let team = await Team.findOne({users: {$elemMatch: {email: req.user.emails[0].value}}});
+        let userData = {
+            user: req.user,
+            team
+        };
+        res.json({
+            success: true,
+            message: 'success',
+            result: userData
+        });
+    } catch (e) {
+        res.status(500).json({
+            success: false,
+            message: 'server-error',
+            errorCode: 0,
+            errMessage: 'An internal server error has occured.'
+        });
+    }
 });
 
 router.get('/team', async (req, res) => {
