@@ -96,8 +96,7 @@ router.post('/new', async function(req, res) {
             user: req.user.emails[0].value
         });
 
-        let teamID = typeof req.user._json.user_metadata === 'undefined' ? 'UNDEFINED' : req.user._json.user_metadata.teamCode;
-        let team = await Team.findOne({id: teamID});
+        let team = await Team.findOne({users: {$elemMatch: {email: req.user.emails[0].value}}});
         if (!team) {
             return res.json({
                 success: false,
