@@ -67,7 +67,6 @@ router.post('/join', async function(req, res) {
             });
         }
 
-        await utils.updateUserTeamCode(req.user.id, req.body.teamCode);
         var userData = new TeamUserData({
             firstName: req.user.name.givenName,
             lastName: req.user.name.familyName,
