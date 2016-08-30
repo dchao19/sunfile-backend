@@ -5,7 +5,7 @@ var strategy = new Auth0Strategy({
     domain: 'danielchao.auth0.com',
     clientID: 'YytKzUCZRb4rn3D6ybVCoPHukSgePHbb',
     clientSecret: 'Bvbh1LP1ZOYNCTGSkI5P4q2DGIRtvW14kFPhLaoMnAdxMLbMRDTHXI1Iwtj1YQM2',
-    callbackURL: '/callback'
+    callbackURL: 'https://sunfile-danielchao.rhcloud.com/api/auth/callback'
 }, (accessToken, refreshToken, extraParams, profile, done) => {
     return done(null, profile);
 });
