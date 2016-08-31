@@ -24,7 +24,7 @@ router.post('/content', function(req, res) {
                 {
                     apikey: apiKeys.alchemy,
                     html: htmlData,
-                    extract: "authors,pub-date,keywords,title", // We want to extract authors, the publication date, keywords, and the title
+                    extract: "pub-date, keywords", // We want to extract authors, the publication date, keywords, and the title
                     outputMode: "json"
                 },
                 function(metadata) {
@@ -34,19 +34,23 @@ router.post('/content', function(req, res) {
                             html: htmlData,
                             outputMode: "json"
                         },
-                        function(content) {
+                        async function(content) {
                             if (metadata.error || content.error || !content.body.text) { // If there is an error or no content was returned from the text extraction, error 500 and don't continue
                                 res.json(500, {message: "Server error", errMessage: "An unexpected server error has occured."});
                             } else {
+                                let publicationDate = await apiHelpers.aylienAsyncData(apiUrls.DATE, {
+                                    html: htmlData
+                                });
+                                let actualPubDate = publicationDate.body.publishDate ? publicationDate.body.publishDate : metadata.body.publicationDate.date;
                                 apiHelpers.parseKeywords(metadata.body.keywords, [], 0, function(keywords) { // Node can't do sync loops so we do this method recursively and callback when complete
                                     res.json({
                                         message: "success",
                                         result: {
                                             paragraphs: apiHelpers.parseParagraphs(content.body.text), // The templater expects the paragraphs to be arrays of key/value pairs
-                                            title: metadata.body.title,
-                                            keywords,
-                                            author: metadata.body.authors.names[0],
-                                            pubDate: metadata.body.publicationDate.date,
+                                            title: publicationDate.body.title,
+                                            keywords: metadata.body.keywords,
+                                            author: publicationDate.body.author,
+                                            pubDate: actualPubDate,
                                             text: content.body.text
                                         }
                                     });
