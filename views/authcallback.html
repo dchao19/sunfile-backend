@@ -1,12 +1,14 @@
 <html>
     <head>
         <title>Logging In...</title>
-        <script type="text/javascript">
-            chrome.runtime.sendMessage('ljhciodenpkegapaikengdbcglopgome', {authCompleted: true});
-            window.close();
-        </script> 
     </head>
     <body>
-        <p>This window should close automatically. If it does not within three seconds, manually close this window and re-open the extension</p>
+        <script type="text/javascript">
+            setTimeout(() => {
+                chrome.runtime.sendMessage('ljhciodenpkegapaikengdbcglopgome', {authCompleted: true});
+                window.close();
+            }, 3000);
+        </script> 
+        <p>This window will close automatically in 3 seconds. You can either wait or close it now, but either way, reopen the extension.</p>
     </body>
 <html>
