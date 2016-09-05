@@ -112,7 +112,7 @@ router.post('/new', async function(req, res) {
         let duplicateArticle = await utils.checkDuplicate(team.articles, newArticle);
 
         if (duplicateArticle) {
-            return res.json({
+            return res.status(409).json({
                 success: false,
                 message: 'already-exists-error',
                 errorCode: 900,
