@@ -19,7 +19,7 @@ router.post('/content', function(req, res) {
         require("jsdom").env("", function(err, window) {
             var $ = require("jquery")(window);
             var preStrip = $('<div/>').html(req.body);
-            var htmlData = preStrip.find('.last-update,.fyre,style,script.layout-detail-page__footer,.teaser__byline').remove().end().html();
+            var htmlData = preStrip.find('.last-update,.fyre,style,script,.layout-detail-page__footer,.teaser__byline').remove().end().html();
             apiHelpers.watsonRequestFactory(apiUrls.COMBINED, // Generate combined call to Watson to gather metadaat about article
                 {
                     apikey: apiKeys.alchemy,
