@@ -2,15 +2,18 @@ var express = require('express');
 var apiKeys = require('../utils/apiKeys');
 var apiHelpers = require('../utils/apiHelpers');
 var apiUrls = require('../utils/apiUrls');
+var passport = require('passport');
 var router = express.Router(); // eslint-disable-line
 
 var Article = require('../models/Article');
 var Team = require('../models/Team');
 var Utils = require('../utils/utils');
 var utils = new Utils();
-var requiresLogin = require('../utils/requiresLogin');
 
-router.use(requiresLogin);
+router.use(passport.authenticate('bearer', {
+    session: false,
+    failureRedirect: '/api/auth/loudfailure'
+}));
 
 router.post('/content', function(req, res) {
     req.accepts('html'); // The easiest way to not break the formatting of JSON is by directly POSTing the HTML content of page. Potentially insecure.
@@ -97,10 +100,10 @@ router.post('/new', async function(req, res) {
             title: req.body.title,
             longPublication: fileCodes.longName,
             shortPublication: fileCodes.shortName,
-            user: req.user.emails[0].value
+            user: req.user.email
         });
 
-        let team = await Team.findOne({users: {$elemMatch: {email: req.user.emails[0].value}}});
+        let team = await Team.findOne({users: {$elemMatch: {email: req.user.email}}});
         if (!team) {
             return res.json({
                 success: false,
@@ -133,6 +136,36 @@ router.post('/new', async function(req, res) {
             success: true,
             message: 'success',
             result: newArticle
+        });
+    } catch (e) {
+        res.status(500).json({
+            success: false,
+            message: 'server-error',
+            errorCode: 0,
+            errMessage: 'An internal server error has occured.'
+        });
+    }
+});
+
+router.get('/recents', async (req, res) => {
+    try {
+        let queryLength = (req.query.length) ? req.query.length : 5;
+
+        let team = await Team.findOne({users: {$elemMatch: {email: req.user.email}}});
+        if (!team) {
+            return res.json({
+                success: false,
+                message: 'not-found-error',
+                errorCode: 3,
+                errMessage: 'The user\'s team could not be found'
+            });
+        }
+
+        let result = team.articles.slice(team.articles.length - (queryLength));
+        res.send({
+            success: true,
+            message: 'success',
+            result
         });
     } catch (e) {
         res.status(500).json({

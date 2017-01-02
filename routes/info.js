@@ -1,16 +1,19 @@
 var express = require('express');
+var passport = require('passport');
 var router = express.Router(); // eslint-disable-line
 
 var Team = require('../models/Team');
 
-var requiresLogin = require('../utils/requiresLogin');
 var StatUtils = require('../utils/statUtils');
 
-router.use(requiresLogin);
+router.use(passport.authenticate('bearer', {
+    session: false,
+    failureRedirect: '/api/auth/loudfailure'
+}));
 
 router.get('/user', async (req, res) => {
     try {
-        let team = await Team.findOne({users: {$elemMatch: {email: req.user.emails[0].value}}});
+        let team = await Team.findOne({users: {$elemMatch: {email: req.user.email}}});
         let userData = {
             user: req.user,
             team
@@ -31,7 +34,7 @@ router.get('/user', async (req, res) => {
 });
 
 router.get('/team', async (req, res) => {
-    let team = await Team.findOne({users: {$elemMatch: {email: req.user.emails[0].value}}});
+    let team = await Team.findOne({users: {$elemMatch: {email: req.user.email}}});
     if (!team) {
         return res.json({
             success: false,
@@ -50,7 +53,7 @@ router.get('/team', async (req, res) => {
 router.get('/stats', async function (req, res) {
     try {
         let statUtils = new StatUtils();
-        let team = await Team.findOne({users: {$elemMatch: {email: req.user.emails[0].value}}});
+        let team = await Team.findOne({users: {$elemMatch: {email: req.user.email}}});
         if (!team) {
             return res.json({
                 success: false,
@@ -62,7 +65,7 @@ router.get('/stats', async function (req, res) {
 
         let teamArticles = team.articles;
         let userArticles = team.articles.filter((article) => {
-            return article.user === req.user.emails[0].value;
+            return article.user === req.user.email;
         });
 
         let [userCharts, teamCharts] = await Promise.all([

@@ -1,23 +1,26 @@
 var passport = require('passport');
-var Auth0Strategy = require('passport-auth0');
+var BearerStrategy = require('passport-http-bearer');
+var AuthenticationClient = require('auth0').AuthenticationClient;
 
-var strategy = new Auth0Strategy({
+var auth0 = new AuthenticationClient({
     domain: 'danielchao.auth0.com',
-    clientID: 'YytKzUCZRb4rn3D6ybVCoPHukSgePHbb',
-    clientSecret: 'Bvbh1LP1ZOYNCTGSkI5P4q2DGIRtvW14kFPhLaoMnAdxMLbMRDTHXI1Iwtj1YQM2',
-    callbackURL: 'https://sunfile-danielchao.rhcloud.com/api/auth/callback'
-}, (accessToken, refreshToken, extraParams, profile, done) => {
-    return done(null, profile);
+    clientId: 'YytKzUCZRb4rn3D6ybVCoPHukSgePHbb'
+});
+
+var strategy = new BearerStrategy(async (token, done) => {
+    try {
+        console.log(token);
+        let profile = await auth0.getProfile(token);
+        console.log(profile);
+        let authResult = (typeof profile === 'undefined' || profile === 'Unauthorized') ? false : JSON.parse(profile);
+        console.log(authResult);
+        return done(null, authResult);
+    } catch (e) {
+        return done(e);
+    }
 });
 
 passport.use(strategy);
-passport.serializeUser(function(user, done) {
-    done(null, user);
-});
-
-passport.deserializeUser(function(user, done) {
-    done(null, user);
-});
 
 module.exports = strategy;
 
