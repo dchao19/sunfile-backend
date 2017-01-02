@@ -1,4 +1,5 @@
 var express = require('express');
+var passport = require('passport');
 var router = express.Router(); // eslint-disable-line
 
 var Team = require('../models/Team');
@@ -6,12 +7,22 @@ var TeamUserData = require('../models/TeamUserData');
 
 var Utils = require('../utils/utils');
 var utils = new Utils();
-var requiresLogin = require('../utils/requiresLogin');
 
-router.use(requiresLogin);
+router.use(passport.authenticate('bearer', {
+    session: false,
+    failureRedirect: '/api/auth/loudfailure'
+}));
 
 router.post('/new', async function(req, res) {
     try {
+        if (!req.body.schoolName) {
+            return res.status(400).json({
+                success: false,
+                message: 'missing-data-error',
+                errorCode: 4,
+                errMessage: "The schoolName property was not specified with the request. This is a required parameter"
+            });
+        }
         let teamCode = await utils.generateAndVerifyTeamCode();
         let existingTeam = await Team.findOne({schoolName: req.body.schoolName});
         if (existingTeam) {
@@ -27,7 +38,7 @@ router.post('/new', async function(req, res) {
             firstName: req.user.given_name,
             lastName: req.user.family_name,
             numArticles: 0,
-            email: req.user.emails[0].value
+            email: req.user.email
         });
 
         var newTeam = new Team({
@@ -38,7 +49,7 @@ router.post('/new', async function(req, res) {
         });
 
         newTeam.save();
-        await utils.updateUserTeamCode(req.user.id, teamCode);
+        await utils.updateUserTeamCode(req.user.user_id, teamCode);
 
         res.json({
             success: true,
@@ -46,6 +57,7 @@ router.post('/new', async function(req, res) {
             result: newTeam
         });
     } catch (e) {
+        console.log(e);
         res.status(500).json({
             success: false,
             message: 'server-error',
@@ -68,10 +80,10 @@ router.post('/join', async function(req, res) {
         }
 
         var userData = new TeamUserData({
-            firstName: req.user.name.givenName,
-            lastName: req.user.name.familyName,
+            firstName: req.user.givenName,
+            lastName: req.user.familyName,
             numArticles: 0,
-            email: req.user.emails[0].value
+            email: req.user.email
         });
         team.users.push(userData);
         team.save();

@@ -1,9 +1,8 @@
 var express = require('express');
+var passport = require('passport');
 var router = express.Router();
 
 var Source = require('../models/Source');
-
-var requiresLogin = require('../utils/requiresLogin');
 
 router.get('/', async function(req, res) {
     var sourcesShort = {};
@@ -30,8 +29,11 @@ router.get('/', async function(req, res) {
     }
 });
 
-router.post('/new', requiresLogin, async function (req, res) {
-    if (typeof req.user._json.app_metadata !== 'undefined' && req.user._json.app_metadata.advancedRole === "admin") {
+router.post('/new', router.use(passport.authenticate('bearer', {
+    session: false,
+    failureRedirect: '/api/auth/loudfailure'
+})), async function (req, res) {
+    if (typeof req.user.app_metadata !== 'undefined' && req.user.app_metadata.advancedRole === "admin") {
         try {
             let source = await Source.findOne({host: req.body.host});
             if (source) {

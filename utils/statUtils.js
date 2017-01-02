@@ -46,25 +46,21 @@ class StatUtils {
 
                 if (sourcesNum.hasOwnProperty(article.longPublication)) {
                     sourcesNum[article.longPublication]++;
+                    done();
+                } else if (sourcesLabel.length > 20) {
+                    done();
                 } else {
                     var colors = this.generateRandomColor();
                     sourcesNum[article.longPublication] = 1;
                     sourcesColor.push(colors.color);
                     sourcesHighlight.push(colors.highlight);
                     sourcesLabel.push(article.shortPublication);
-
-                    // sourcesNum[article.longPublication] = {
-                    //     color: colors.color,
-                    //     highlight: colors.highlight,
-                    //     label: article.shortPublication,
-                    //     long: article.longPublication,
-                    //     value: 1
-                    // };
+                    done();
                 }
-
-                done();
             }, async () => {
                 let sourcesNumArray = Object.values(sourcesNum);
+                console.log(sourcesNumArray);
+
                 let sourcePie = {
                     labels: sourcesLabel,
                     datasets: [

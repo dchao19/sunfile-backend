@@ -35,7 +35,9 @@ mongoose.Promise = global.Promise;
 
 var app = express();
 app.set('view engine', 'pug');
-app.use(logger('dev'));
+if (process.env.NODE_ENV !== 'test') {
+    app.use(logger('dev'));
+}
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.text({type: 'html', limit: '50mb'}));
 app.use(bodyParser.urlencoded({extended: false}));
