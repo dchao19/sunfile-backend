@@ -8,7 +8,7 @@ var TeamUserData = require('../models/TeamUserData');
 var Utils = require('../utils/utils');
 var utils = new Utils();
 
-router.use(passport.authenticate('bearer', {
+router.use(passport.authenticate('jwt', {
     session: false,
     failureRedirect: '/api/auth/loudfailure'
 }));
@@ -34,22 +34,14 @@ router.post('/new', async function(req, res) {
             });
         }
 
-        var userData = new TeamUserData({
-            firstName: req.user.given_name,
-            lastName: req.user.family_name,
-            numArticles: 0,
-            email: req.user.email
-        });
-
         var newTeam = new Team({
             contactEmail: req.body.contactEmail,
             schoolName: req.body.schoolName,
             id: teamCode,
-            users: userData
+            users: [req.user._id]
         });
 
         newTeam.save();
-        await utils.updateUserTeamCode(req.user.user_id, teamCode);
 
         res.json({
             success: true,
@@ -79,13 +71,7 @@ router.post('/join', async function(req, res) {
             });
         }
 
-        var userData = new TeamUserData({
-            firstName: req.user.givenName,
-            lastName: req.user.familyName,
-            numArticles: 0,
-            email: req.user.email
-        });
-        team.users.push(userData);
+        team.users.push(req.user._id);
         team.save();
 
         res.json({

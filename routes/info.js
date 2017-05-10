@@ -3,10 +3,11 @@ var passport = require('passport');
 var router = express.Router(); // eslint-disable-line
 
 var Team = require('../models/Team');
+var Article = require('../models/Article');
 
 var StatUtils = require('../utils/statUtils');
 
-router.use(passport.authenticate('bearer', {
+router.use(passport.authenticate('jwt', {
     session: false,
     failureRedirect: '/api/auth/loudfailure'
 }));
@@ -54,6 +55,7 @@ router.get('/stats', async function (req, res) {
     try {
         let statUtils = new StatUtils();
         let team = await Team.findOne({users: {$elemMatch: {email: req.user.email}}});
+        let promiseStack = [];
         if (!team) {
             return res.json({
                 success: false,
@@ -63,10 +65,25 @@ router.get('/stats', async function (req, res) {
             });
         }
 
-        let teamArticles = team.articles;
-        let userArticles = team.articles.filter((article) => {
-            return article.user === req.user.email;
+        team.users.forEach((user) => {
+            promiseStack.push(Article.count({user: user.email}));
         });
+
+        let teamUserArticles = await Promise.all(promiseStack);
+        let newTeamUsers = team.users.map((user, i) => {
+            return {
+                email: user.email,
+                firstName: user.firstName,
+                lastName: user.lastName,
+                numArticles: teamUserArticles[i]
+            };
+        });
+
+
+        let [userArticles, teamArticles] = await Promise.all([
+            Article.find({user: req.user.email}),
+            Article.find({teamCode: team.teamCode})
+        ]);
 
         let [userCharts, teamCharts] = await Promise.all([
             statUtils.generateData(userArticles, "My Articles"),
@@ -87,8 +104,8 @@ router.get('/stats', async function (req, res) {
                 teamArticlesLine: teamCharts.line,
                 teamInfo: {
                     name: team.schoolName,
-                    code: team.id,
-                    users: team.users
+                    code: team.teamCode,
+                    users: newTeamUsers
                 }
             }
         });

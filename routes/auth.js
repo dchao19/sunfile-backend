@@ -22,7 +22,7 @@ router.get('/loudfailure', (req, res) => {
 });
 
 router.get('/verify',
-    passport.authenticate('bearer', {
+    passport.authenticate('jwt', {
         session: false,
         failureRedirect: '/api/auth/quietfailure'
     }), function(req, res) {

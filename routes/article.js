@@ -10,7 +10,7 @@ var Team = require('../models/Team');
 var Utils = require('../utils/utils');
 var utils = new Utils();
 
-router.use(passport.authenticate('bearer', {
+router.use(passport.authenticate('jwt', {
     session: false,
     failureRedirect: '/api/auth/loudfailure'
 }));
@@ -95,14 +95,6 @@ router.post('/summary', function(req, res) {
 
 router.post('/new', async function(req, res) {
     try {
-        let fileCodes = await utils.findFileCodes(req.body.url);
-        var newArticle = new Article({
-            title: req.body.title,
-            longPublication: fileCodes.longName,
-            shortPublication: fileCodes.shortName,
-            user: req.user.email
-        });
-
         let team = await Team.findOne({users: {$elemMatch: {email: req.user.email}}});
         if (!team) {
             return res.json({
@@ -112,7 +104,22 @@ router.post('/new', async function(req, res) {
                 errMessage: 'The user\'s team could not be found'
             });
         }
-        let duplicateArticle = await utils.checkDuplicate(team.articles, newArticle);
+
+        let fileCodes = await utils.findFileCodes(req.body.url);
+        var newArticle = new Article({
+            title: req.body.title,
+            longPublication: fileCodes.longName,
+            shortPublication: fileCodes.shortName,
+            user: req.user.email,
+            teamCode: team.teamCode
+        });
+
+
+        let duplicateArticle = await Article.findOne({
+            user: req.user.email,
+            title: newArticle.title,
+            teamCode: team.teamCode
+        });
 
         if (duplicateArticle) {
             return res.status(409).json({
@@ -123,14 +130,9 @@ router.post('/new', async function(req, res) {
             });
         }
 
-        team.articles.push(newArticle);
-        team.users = team.users.map((user) => {
-            if (user.email === newArticle.user) {
-                user.numArticles++;
-            }
-            return user;
-        });
+        team.articles.push(newArticle._id);
         team.save();
+        newArticle.save();
 
         res.json({
             success: true,
@@ -138,6 +140,7 @@ router.post('/new', async function(req, res) {
             result: newArticle
         });
     } catch (e) {
+        console.error(e);
         res.status(500).json({
             success: false,
             message: 'server-error',
@@ -150,23 +153,40 @@ router.post('/new', async function(req, res) {
 router.get('/recents', async (req, res) => {
     try {
         let queryLength = (req.query.length) ? req.query.length : 5;
+        let articles = await Article.find({user: req.user.email});
 
-        let team = await Team.findOne({users: {$elemMatch: {email: req.user.email}}});
-        if (!team) {
-            return res.json({
-                success: false,
-                message: 'not-found-error',
-                errorCode: 3,
-                errMessage: 'The user\'s team could not be found'
-            });
-        }
-
-        let result = team.articles.slice(team.articles.length - (queryLength));
+        let result = articles.slice(articles.length - (queryLength));
         res.send({
             success: true,
             message: 'success',
             result
         });
+    } catch (e) {
+        res.status(500).json({
+            success: false,
+            message: 'server-error',
+            errorCode: 0,
+            errMessage: 'An internal server error has occured.'
+        });
+    }
+});
+
+router.delete('/delete', async (req, res) => {
+    try {
+        let article = await Article.findByIdAndRemove(req.query._id);
+        if (article) {
+            return res.json({
+                success: true,
+                message: 'deleted'
+            });
+        } else {
+            return res.status(404).json({
+                success: false,
+                message: 'article-not-found',
+                errorCode: 5,
+                errMessage: 'The article to be deleted could not by found.'
+            });
+        }
     } catch (e) {
         res.status(500).json({
             success: false,

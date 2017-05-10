@@ -35,7 +35,8 @@ describe('Tests on /teams', () => {
         it('should require authorization', (done) => {
             request(app)
                 .post('/api/teams/new')
-                .expect(401)
+                .expect(302)
+                .expect('Location', '/api/auth/loudfailure')
                 .end((err) => {
                     if (err) {
                         return done(err);
@@ -46,6 +47,7 @@ describe('Tests on /teams', () => {
         it('should respond with an error if not all data is provided', (done) => {
             request(app)
                 .post('/api/teams/new')
+                .set('Authorization', 'Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9.eyJpc3MiOiJodHRwczovL2RhbmllbGNoYW8uYXV0aDAuY29tLyIsInN1YiI6Imdvb2dsZS1vYXV0aDJ8MTAxNDYzODk0OTczNjM5OTMzMTcyIiwiYXVkIjoiWXl0S3pVQ1pSYjRybjNENnliVkNvUEh1a1NnZVBIYmIiLCJleHAiOjE0OTA5NjIyNjksImlhdCI6MTQ5MDkyNjI2OX0.0LI4Vly2VkCWvWPvJuTlWYv08H0qJSMaCMmJOFRGlz4')
                 .expect(400)
                 .end((err) => {
                     if (err) {

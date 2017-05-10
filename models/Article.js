@@ -2,12 +2,11 @@
 var Schema = mongoose.Schema;
 var timestamp = require('mongoose-timestamp');
 
-var Article = new Schema({
+let Article = new Schema({
     title: String,
-    teamID: String,
     longPublication: String,
     shortPublication: String,
-    articleContent: String,
+    teamCode: String,
     user: String
 });
 
