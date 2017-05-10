@@ -30,11 +30,7 @@ class StatUtils {
     }
     async generateData(allArticles, label) {
         return new Promise((resolve) => {
-            let sourceData = {};
             let sourcesNum = {};
-            let sourcesColor = [];
-            let sourcesHighlight = [];
-            let sourcesLabel = [];
 
             let today = moment();
             let articlesOnDays = new Array(today.date() + 1).fill(0);
@@ -45,34 +41,58 @@ class StatUtils {
                 }
 
                 if (sourcesNum.hasOwnProperty(article.longPublication)) {
-                    sourcesNum[article.longPublication]++;
-                    done();
-                } else if (sourcesLabel.length > 20) {
+                    sourcesNum[article.longPublication].value++;
                     done();
                 } else {
                     var colors = this.generateRandomColor();
-                    sourcesNum[article.longPublication] = 1;
-                    sourcesColor.push(colors.color);
-                    sourcesHighlight.push(colors.highlight);
-                    sourcesLabel.push(article.shortPublication);
+
+                    sourcesNum[article.longPublication] = {
+                        value: 1,
+                        label: article.shortPublication,
+                        color: colors.color,
+                        highlight: colors.highlight
+                    };
+
                     done();
                 }
             }, async () => {
                 let sourcesNumArray = Object.values(sourcesNum);
-                console.log(sourcesNumArray);
+                sourcesNumArray.sort((a, b) => {
+                    return b.value - a.value;
+                });
+
+                let top = sourcesNumArray.slice(0, 15);
+                let bottom = sourcesNumArray.slice(15);
+
+                if (typeof bottom[0] !== 'undefined') {
+                    let bottomSum = bottom.reduce(((total, elem) => total + elem.value), 0);
+                    console.log(bottomSum);
+                    top.push({
+                        value: bottomSum,
+                        label: 'Other',
+                        color: bottom[0].color,
+                        highlight: bottom[0].highlight
+                    });
+                }
+
+                let values = top.map((a) => a.value);
+                let colors = top.map((a) => a.color);
+                let labels = top.map((a) => a.label);
+                let highlight = top.map((a) => a.highlight);
 
                 let sourcePie = {
-                    labels: sourcesLabel,
+                    labels,
                     datasets: [
                         {
                             label: "My Sources",
-                            data: sourcesNumArray,
-                            backgroundColor: sourcesColor,
-                            hoverBackgroundColor: sourcesHighlight
+                            data: values,
+                            backgroundColor: colors,
+                            hoverBackgroundColor: highlight
                         }
                     ]
                 };
-                var labels = await this.generateChartLabels();
+                let articleLabels = await this.generateChartLabels();
+
                 var datasets = [
                     {
                         label,
@@ -87,7 +107,7 @@ class StatUtils {
                 resolve({
                     pie: sourcePie,
                     line: {
-                        labels,
+                        labels: articleLabels,
                         datasets
                     }
                 });

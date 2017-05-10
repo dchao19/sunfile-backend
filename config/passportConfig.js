@@ -1,26 +1,56 @@
 var passport = require('passport');
-var BearerStrategy = require('passport-http-bearer');
-var AuthenticationClient = require('auth0').AuthenticationClient;
+var passportJWT = require('passport-jwt');
+var Account = require('../models/Account');
 
-var auth0 = new AuthenticationClient({
-    domain: 'danielchao.auth0.com',
-    clientId: 'YytKzUCZRb4rn3D6ybVCoPHukSgePHbb'
-});
+import {requestProfile} from './requestProfile';
 
-var strategy = new BearerStrategy(async (token, done) => {
+let ExtractJWT = passportJWT.ExtractJwt;
+let JWTStrategy = passportJWT.Strategy;
+
+let jwtOptions = {
+    jwtFromRequest: ExtractJWT.fromAuthHeaderWithScheme('Bearer'),
+    secretOrKey: Buffer.from(process.env.CLIENT_SECRET, 'base64'),
+    passReqToCallback: true
+};
+
+let serializer = async (req, jwtPayload, done) => {
     try {
-        console.log(token);
-        let profile = await auth0.getProfile(token);
-        console.log(profile);
-        let authResult = (typeof profile === 'undefined' || profile === 'Unauthorized') ? false : JSON.parse(profile);
-        console.log(authResult);
-        return done(null, authResult);
+        let user = await Account.findOne({userID: jwtPayload.sub});
+        if (user) {
+            return done(null, user);
+        }
+        let jwt = req.headers.authorization;
+        jwt = jwt.substring(jwt.indexOf(' ') + 1);
+
+        let userProfile = await requestProfile(jwt);
+
+        let userData = {
+            email: userProfile.email,
+            name: userProfile.name,
+            userID: jwtPayload.sub
+        };
+
+        let newUser = new Account(userData);
+        await newUser.save();
+
+        return done(null, newUser);
     } catch (e) {
-        return done(e);
+        console.log(e);
+        return done(e, false);
     }
-});
+};
 
-passport.use(strategy);
+// var strategy = new BearerStrategy(async (token, done) => {
+//     try {
+//         // let user = await Account.findOne({userID: jwtPayload.sub})
+//         //let profile = await auth0.getProfile(token);
+//         console.log(profile);
+//         let authResult = (typeof profile === 'undefined' || profile === 'Unauthorized') ? false : JSON.parse(profile);
+//         return done(null, authResult);
+//     } catch (e) {
+//         return done(e);
+//     }
+// });
 
-module.exports = strategy;
+passport.use(new JWTStrategy(jwtOptions, serializer));
 

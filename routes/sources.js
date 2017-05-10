@@ -18,7 +18,8 @@ router.get('/', async function(req, res) {
             message: 'success',
             result: {
                 sources: sourcesShort,
-                sourcesFullName: sourcesLong
+                sourcesFullName: sourcesLong,
+                sourcesComplete: sources
             }
         });
     } catch (e) {
@@ -29,7 +30,7 @@ router.get('/', async function(req, res) {
     }
 });
 
-router.post('/new', router.use(passport.authenticate('bearer', {
+router.post('/new', router.use(passport.authenticate('jwt', {
     session: false,
     failureRedirect: '/api/auth/loudfailure'
 })), async function (req, res) {

@@ -1,17 +1,13 @@
 ﻿var mongoose = require('mongoose');
 var Schema = mongoose.Schema;
-var passportLocalMongoose = require('passport-local-mongoose');
-var Article = require('./Article.js');
 
 var Account = new Schema({
-    username: String,
-    password: String,
-    teamId: String,
+    userID: String,
+    teamCode: String,
+    email: String,
     firstName: String,
     lastName: String,
-    articles: [Article.schema]
+    name: String,
 });
-
-Account.plugin(passportLocalMongoose);
 
 module.exports = mongoose.model('Account', Account);
