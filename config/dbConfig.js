@@ -6,6 +6,8 @@ if (process.env.SUNFILE_DB_PASSWORD && !process.env.IS_KENT) {
 } else if (process.env.IS_KENT) {
     connectionString = process.env.SUNFILE_DB_USERNAME + ":" + process.env.SUNFILE_DB_PASSWORD + "@" +
     'localhost:27017/sunfile-beta';
+} else if (process.env.NODE_ENV === 'test') {
+    connectionString = 'mongodb://localhost:27017/sunfile-test';
 }
 
 module.exports = {

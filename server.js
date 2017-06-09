@@ -29,7 +29,9 @@ mongoose.connect(dbConfig.url, function(err) {
     if (err) {
         throw err;
     }
-    console.log("Successfully connected to MongoDB");
+    if (process.env.NODE_ENV !== 'test') {
+        console.log("Successfully connected to MongoDB");
+    }
 });
 mongoose.Promise = global.Promise;
 
@@ -71,7 +73,9 @@ app.use('/api/mobile', mobileRoutes);
 app.use('/api/article', articleRoutes);
 
 app.listen(port, ipaddress, () => {
-    console.log("Express server listening on " + ipaddress + ":" + port);
+    if (process.env.NODE_ENV !== 'test') {
+        console.log("Express server listening on " + ipaddress + ":" + port);
+    }
 });
 
 module.exports = app;

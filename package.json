@@ -25,13 +25,16 @@
     "babel-preset-stage-0": "^6.5.0",
     "babel-register": "^6.9.0",
     "body-parser": "^1.15.0",
+    "chai": "^4.0.1",
     "connect-mongo": "^1.1.0",
     "cors": "^2.7.1",
+    "cross-env": "^5.0.0",
     "ejs": "^2.4.2",
     "express": "^4.13.4",
     "express-session": "^1.13.0",
     "jquery": "^3.1.0",
     "jsdom": "^9.4.1",
+    "jsonwebtoken": "^7.4.1",
     "just.randomcolor": "^0.1.1",
     "mocha": "^3.2.0",
     "moment": "^2.12.0",
@@ -66,6 +69,6 @@
     "start": "node start.js",
     "babel-node": "babel-node",
     "nodemon-start": "nodemon --exec npm run babel-node -- server.js",
-    "test": "mocha --compilers js:babel-register"
+    "test": "cross-env NODE_ENV=test mocha --compilers js:babel-register"
   }
 }

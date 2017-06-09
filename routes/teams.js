@@ -3,6 +3,7 @@ var passport = require('passport');
 var router = express.Router(); // eslint-disable-line
 
 var Team = require('../models/Team');
+var Account = require('../models/Account');
 var TeamUserData = require('../models/TeamUserData');
 
 var Utils = require('../utils/utils');
@@ -22,6 +23,13 @@ router.post('/new', async function(req, res) {
                 errorCode: 4,
                 errMessage: "The schoolName property was not specified with the request. This is a required parameter"
             });
+        } else if (!req.body.contactEmail) {
+            return res.status(400).json({
+                success: false,
+                message: 'missing-data-error',
+                errorCode: 4,
+                errMessage: "The contactEmail property was not specified with the request. This is a required parameter"
+            });
         }
         let teamCode = await utils.generateAndVerifyTeamCode();
         let existingTeam = await Team.findOne({schoolName: req.body.schoolName});
@@ -37,7 +45,7 @@ router.post('/new', async function(req, res) {
         var newTeam = new Team({
             contactEmail: req.body.contactEmail,
             schoolName: req.body.schoolName,
-            id: teamCode,
+            teamCode,
             users: [req.user._id]
         });
 
@@ -61,7 +69,16 @@ router.post('/new', async function(req, res) {
 
 router.post('/join', async function(req, res) {
     try {
-        let team = await Team.findOne({id: req.body.teamCode});
+        if (!req.body.teamCode) {
+            return res.status(400).json({
+                success: false,
+                message: 'missing-data-error',
+                errorCode: 4,
+                errMessage: "The teamCode property was not specified with the request. This is a required parameter"
+            });
+        }
+
+        let team = await Team.findOne({teamCode: req.body.teamCode});
         if (!team) {
             return res.status(404).json({
                 success: false,
@@ -73,6 +90,10 @@ router.post('/join', async function(req, res) {
 
         team.users.push(req.user._id);
         team.save();
+
+        let user = await Account.findOne({userID: req.user.userID});
+        user.teamCode = req.body.teamCode;
+        user.save();
 
         res.json({
             success: true,
