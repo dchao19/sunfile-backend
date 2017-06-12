@@ -1,0 +1,14 @@
+language: node_js
+node_js:
+  - "node"
+services:
+  - mongodb
+cache:
+  yarn: true
+deploy:
+  provider: heroku
+  api_key:
+    secure: iwreIjZnFvnQu89YLOlEjrRvSjSfjuCS8mGCxqZ4PxLg0tZcZwTDJZ2ot7TCLklVJ4Q9DfFd0sGpLY5nUOx5Bs0E7YUX+qndK44Xt6pbudoYwkIKVe3pnaaQncoGL4J6mQlpj7l7kRqU+A4MtbWCECVyn7hEqhkMnQ/J3CsFcanWJjIA8BztfLlJwLNpGiIxSaXrw4MIiWCCidnn2v+yPyAw9nVdnl5kO5cEwn+aI+G0DD1GwnXQ64iuqPi5Gyx4LZG1wGEVHBbU0dBIA4ARNU3sOL/QYXnEagjVou4t5WTU5Fi5y1oCzL6uYS7B9R5DO3qllwifhv9mObAVyPST15/lTd1Idag8+Kxhhg1aWTvwEchfW9KCh+pD1nDZ65uf4KH80oxoRMmNsQcbuNLr627taT0akOtrmtQbrh6Lkx/xFRQxm3gFX5TEjA6BWg8gFNZatbf8Dh+yUz87yxTyR+bf4OlpyFE4nbak/P6mhK5jzuWnG55OAfoaXyHkaTbs9RqWQ5WOO3BXaPpDN1bDOvAP4uJe08SpqbiOUdNm+2WQYUKEJNZ7u1tGjqTyQUdCiy5kIpA6f2bPolPt3XNZiW2hn6s5g8qE8MWcV8O6VwDKrvI67kRqdNY+6s+0FKYY+00PIvR7lapwUuNwW1n1jMbkVLAAtCD6jqKBSWjRU5k=
+  app:
+    master: sunfile-beta-staing
+    production: sunfile-beta-production

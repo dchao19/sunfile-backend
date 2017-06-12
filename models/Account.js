@@ -7,6 +7,7 @@ var Account = new Schema({
     email: String,
     firstName: String,
     lastName: String,
+    numArticles: Number,
     name: String,
 });
 

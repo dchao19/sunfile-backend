@@ -14,15 +14,23 @@ router.use(passport.authenticate('jwt', {
 
 router.get('/user', async (req, res) => {
     try {
-        let team = await Team.findOne({users: {$elemMatch: {email: req.user.email}}});
-        let userData = {
-            user: req.user,
-            team
-        };
+        let team = await Team.findOne({teamCode: req.user.teamCode});
+        if (!team) {
+            return res.status(404).json({
+                success: false,
+                message: 'not-found-error',
+                errorCode: 3,
+                errMessage: 'The user\'s team could not be found'
+            });
+        }
+
         res.json({
             success: true,
             message: 'success',
-            result: userData
+            result: {
+                user: req.user,
+                team
+            }
         });
     } catch (e) {
         res.status(500).json({
@@ -35,7 +43,7 @@ router.get('/user', async (req, res) => {
 });
 
 router.get('/team', async (req, res) => {
-    let team = await Team.findOne({users: {$elemMatch: {email: req.user.email}}});
+    let team = await Team.findOne({teamCode: req.user.teamCode});
     if (!team) {
         return res.json({
             success: false,
@@ -54,8 +62,7 @@ router.get('/team', async (req, res) => {
 router.get('/stats', async function (req, res) {
     try {
         let statUtils = new StatUtils();
-        let team = await Team.findOne({users: {$elemMatch: {email: req.user.email}}});
-        let promiseStack = [];
+        let team = await Team.findOne({teamCode: req.user.teamCode}).populate('users articles');
         if (!team) {
             return res.json({
                 success: false,
@@ -65,29 +72,19 @@ router.get('/stats', async function (req, res) {
             });
         }
 
-        team.users.forEach((user) => {
-            promiseStack.push(Article.count({user: user.email}));
-        });
-
-        let teamUserArticles = await Promise.all(promiseStack);
-        let newTeamUsers = team.users.map((user, i) => {
+        let teamUsers = team.users.map((user) => {
             return {
                 email: user.email,
-                firstName: user.firstName,
-                lastName: user.lastName,
-                numArticles: teamUserArticles[i]
+                firstName: user.name.substring(0, user.name.indexOf(" ")),
+                lastName: user.name.substring(user.name.indexOf(" ") + 1),
+                numArticles: user.numArticles
             };
         });
 
-
-        let [userArticles, teamArticles] = await Promise.all([
-            Article.find({user: req.user.email}),
-            Article.find({teamCode: team.teamCode})
-        ]);
-
+        let userArticles = await Article.find({user: req.user.email});
         let [userCharts, teamCharts] = await Promise.all([
             statUtils.generateData(userArticles, "My Articles"),
-            statUtils.generateData(teamArticles, "Team Articles")
+            statUtils.generateData(team.articles, "Team Articles")
         ]);
 
         res.json({
@@ -96,7 +93,7 @@ router.get('/stats', async function (req, res) {
             result: {
                 userInfo: {
                     myNumArticles: userArticles.length,
-                    teamNumArticles: teamArticles.length
+                    teamNumArticles: team.articles.length
                 },
                 userSourcesPie: userCharts.pie,
                 userArticlesLine: userCharts.line,
@@ -105,7 +102,7 @@ router.get('/stats', async function (req, res) {
                 teamInfo: {
                     name: team.schoolName,
                     code: team.teamCode,
-                    users: newTeamUsers
+                    users: teamUsers
                 }
             }
         });

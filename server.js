@@ -20,19 +20,16 @@ var teamRoutes = require('./routes/teams');
 var infoRoutes = require('./routes/info');
 
 require('./config/passportConfig');
-var dbConfig = require('./config/dbConfig.js');
+require('./config/dbConfig.js');
 
 var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
 var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
 
-mongoose.connect(dbConfig.url, function(err) {
-    if (err) {
-        throw err;
-    }
-    if (process.env.NODE_ENV !== 'test') {
-        console.log("Successfully connected to MongoDB");
-    }
-});
+if (process.env.NODE_ENV === 'heroku-staging') {
+    port = process.env.PORT;
+    ipaddress = "0.0.0.0";
+}
+
 mongoose.Promise = global.Promise;
 
 var app = express();
@@ -45,7 +42,7 @@ app.use(bodyParser.text({type: 'html', limit: '50mb'}));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, 'views')));
 app.use(session({
-    secret: 'Bvbh1LP1ZOYNCTGSkI5P4q2DGIRtvW14kFPhLaoMnAdxMLbMRDTHXI1Iwtj1YQM2',
+    secret: process.env.CLIENT_SECRET,
     store: new MongoStore({mongooseConnection: mongoose.connection}),
     rolling: true,
     saveUninitialized: false,

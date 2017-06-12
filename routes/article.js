@@ -95,9 +95,26 @@ router.post('/summary', function(req, res) {
 
 router.post('/new', async function(req, res) {
     try {
-        let team = await Team.findOne({users: {$elemMatch: {email: req.user.email}}});
+        if (!req.body.url) {
+            return res.status(400).json({
+                success: false,
+                message: 'missing-data-error',
+                errorCode: 4,
+                errMessage: "The url property was not specified with the request. This is a required parameter"
+            });
+        }
+        if (!req.body.title) {
+            return res.status(400).json({
+                success: false,
+                message: 'missing-data-error',
+                errorCode: 4,
+                errMessage: "The title property was not specified with the request. This is a required parameter"
+            });
+        }
+
+        let team = await Team.findOne({teamCode: req.user.teamCode});
         if (!team) {
-            return res.json({
+            return res.status(404).json({
                 success: false,
                 message: 'not-found-error',
                 errorCode: 3,
@@ -111,12 +128,11 @@ router.post('/new', async function(req, res) {
             longPublication: fileCodes.longName,
             shortPublication: fileCodes.shortName,
             user: req.user.email,
-            teamCode: team.teamCode
+            teamCode: req.user.teamCode
         });
 
 
         let duplicateArticle = await Article.findOne({
-            user: req.user.email,
             title: newArticle.title,
             teamCode: team.teamCode
         });
@@ -173,6 +189,14 @@ router.get('/recents', async (req, res) => {
 
 router.delete('/delete', async (req, res) => {
     try {
+        if (!req.query._id) {
+            return res.status(400).json({
+                success: false,
+                message: 'missing-data-error',
+                errorCode: 4,
+                errMessage: "The _id property was not specified with the request. This is a required parameter"
+            });
+        }
         let article = await Article.findByIdAndRemove(req.query._id);
         if (article) {
             return res.json({
@@ -184,7 +208,7 @@ router.delete('/delete', async (req, res) => {
                 success: false,
                 message: 'article-not-found',
                 errorCode: 5,
-                errMessage: 'The article to be deleted could not by found.'
+                errMessage: 'The article to be deleted could not be found.'
             });
         }
     } catch (e) {

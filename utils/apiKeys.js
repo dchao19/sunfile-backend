@@ -1,8 +1,13 @@
+let alchemyApiKey = (typeof process.env.ALCHEMY_API_KEY === 'undefined') ? "" : process.env.ALCHEMY_API_KEY;
+let aylienAppId = (typeof process.env.AYLIEN_API_ID === 'undefined') ? "" : process.env.AYLIEN_API_ID;
+let aylienAppKey = (typeof process.env.AYLIEN_API_KEY === 'undefined') ? "": process.env.AYLIEN_API_KEY;
+let authUserUpdate = (typeof process.env.AUTH_USER_UPDATE_TOKEN === 'undefined') ? "" : process.env.AUTH_USER_UPDATE_TOKEN;
+
 module.exports = {
-    alchemy: "ALCHEMY_API_KEY",
+    alchemy: alchemyApiKey,
     aylien: {
-        appId: "APP_ID",
-        key: "APP_KEY"
+        appId: aylienAppId,
+        key: aylienAppKey
     },
-    authUserUpdate: "AUTH_USER_UPDATE"
+    authUserUpdate: authUserUpdate
 };
