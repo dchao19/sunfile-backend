@@ -1,3 +1,5 @@
 node_modules
 .ntvs_analysis.dat
 utils/apiKeys.js
+build/
+.vscode/launch.json

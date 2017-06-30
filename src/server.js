@@ -1,13 +1,11 @@
-#!/bin/env node
-//  OpenShift sample Node application
+require("babel-polyfill");
+
 var express = require('express');
 var logger = require('morgan');
 var path = require('path');
 var bodyParser = require('body-parser');
 var mongoose = require('mongoose');
 var passport = require('passport');
-var session = require('express-session');
-var MongoStore = require('connect-mongo/es5')(session);
 var cors = require('cors');
 
 var indexRoutes = require('./routes/index.js');
@@ -37,23 +35,12 @@ app.set('view engine', 'pug');
 if (process.env.NODE_ENV !== 'test') {
     app.use(logger('dev'));
 }
+
 app.use(bodyParser.json({limit: '5mb'}));
 app.use(bodyParser.text({type: 'html', limit: '50mb'}));
 app.use(bodyParser.urlencoded({extended: false}));
 app.use(express.static(path.join(__dirname, 'views')));
-app.use(session({
-    secret: process.env.CLIENT_SECRET,
-    store: new MongoStore({mongooseConnection: mongoose.connection}),
-    rolling: true,
-    saveUninitialized: false,
-    resave: false,
-    cookie: {
-        secure: false,
-        maxAge: 14 * 24 * 60 * 60 * 1000
-    }
-}));
 app.use(passport.initialize());
-app.use(passport.session());
 app.use(cors({
     origin: true,
     credentials: true,
