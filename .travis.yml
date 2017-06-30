@@ -5,6 +5,8 @@ services:
   - mongodb
 cache:
   yarn: true
+before_script:
+  - yarn build
 deploy:
   provider: heroku
   api_key:
