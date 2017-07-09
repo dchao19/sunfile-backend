@@ -43,7 +43,7 @@ router.post('/new', async function(req, res) {
         }
 
         let user = await Account.findOne({userID: req.user.userID});
-        user.teamCode = req.body.teamCode;
+        user.teamCode = teamCode;
         user.save();
 
         var newTeam = new Team({
