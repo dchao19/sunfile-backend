@@ -5,6 +5,9 @@ var apiUrls = require('../utils/apiUrls');
 var passport = require('passport');
 var router = express.Router(); // eslint-disable-line
 
+const jsdom = require("jsdom");
+const {JSDOM} = jsdom;
+
 var Article = require('../models/Article');
 var Team = require('../models/Team');
 var Utils = require('../utils/utils');
@@ -21,51 +24,51 @@ router.post('/content', function(req, res) {
     req.accepts('html'); // The easiest way to not break the formatting of JSON is by directly POSTing the HTML content of page. Potentially insecure.
 
     if (req.body) { // Confirm HTML data was sent in the request
-        require("jsdom").env("", function(err, window) {
-            var $ = require("jquery")(window);
-            var preStrip = $('<div/>').html(req.body);
-            var htmlData = preStrip.find('.last-update,.fyre,style,script,.layout-detail-page__footer,.teaser__byline').remove().end().html();
-            apiHelpers.watsonRequestFactory(apiUrls.COMBINED, // Generate combined call to Watson to gather metadaat about article
-                {
-                    apikey: apiKeys.alchemy,
-                    html: htmlData,
-                    extract: "pub-date, keywords", // We want to extract authors, the publication date, keywords, and the title
-                    outputMode: "json"
-                },
-                function(metadata) {
-                    apiHelpers.watsonRequestFactory(apiUrls.TEXT, // The combined call doesn't provide the text extraction - I need to do it again
-                        {
-                            apikey: apiKeys.alchemy,
-                            html: htmlData,
-                            outputMode: "json"
-                        },
-                        async function(content) {
-                            if (metadata.error || content.error || !content.body.text) { // If there is an error or no content was returned from the text extraction, error 500 and don't continue
-                                res.json(500, {message: "Server error", errMessage: "An unexpected server error has occured."});
-                            } else {
-                                let publicationDate = await apiHelpers.aylienAsyncData(apiUrls.DATE, {
-                                    html: htmlData
+        const {window} = new JSDOM("");
+
+        var $ = require("jquery")(window);
+        var preStrip = $('<div/>').html(req.body);
+        var htmlData = preStrip.find('.last-update,.fyre,style,script,.layout-detail-page__footer,.teaser__byline').remove().end().html();
+        apiHelpers.watsonRequestFactory(apiUrls.COMBINED, // Generate combined call to Watson to gather metadaat about article
+            {
+                apikey: apiKeys.alchemy,
+                html: htmlData,
+                extract: "pub-date, keywords", // We want to extract authors, the publication date, keywords, and the title
+                outputMode: "json"
+            },
+            function(metadata) {
+                apiHelpers.watsonRequestFactory(apiUrls.TEXT, // The combined call doesn't provide the text extraction - I need to do it again
+                    {
+                        apikey: apiKeys.alchemy,
+                        html: htmlData,
+                        outputMode: "json"
+                    },
+                    async function(content) {
+                        if (metadata.error || content.error || !content.body.text) { // If there is an error or no content was returned from the text extraction, error 500 and don't continue
+                            res.json(500, {message: "Server error", errMessage: "An unexpected server error has occured."});
+                        } else {
+                            let publicationDate = await apiHelpers.aylienAsyncData(apiUrls.DATE, {
+                                html: htmlData
+                            });
+                            let actualPubDate = publicationDate.body.publishDate ? publicationDate.body.publishDate : metadata.body.publicationDate.date;
+                            apiHelpers.parseKeywords(metadata.body.keywords, [], 0, function(keywords) { // Node can't do sync loops so we do this method recursively and callback when complete
+                                res.json({
+                                    message: "success",
+                                    result: {
+                                        paragraphs: apiHelpers.parseParagraphs(content.body.text), // The templater expects the paragraphs to be arrays of key/value pairs
+                                        title: publicationDate.body.title,
+                                        keywords: metadata.body.keywords,
+                                        author: publicationDate.body.author,
+                                        pubDate: actualPubDate,
+                                        text: content.body.text
+                                    }
                                 });
-                                let actualPubDate = publicationDate.body.publishDate ? publicationDate.body.publishDate : metadata.body.publicationDate.date;
-                                apiHelpers.parseKeywords(metadata.body.keywords, [], 0, function(keywords) { // Node can't do sync loops so we do this method recursively and callback when complete
-                                    res.json({
-                                        message: "success",
-                                        result: {
-                                            paragraphs: apiHelpers.parseParagraphs(content.body.text), // The templater expects the paragraphs to be arrays of key/value pairs
-                                            title: publicationDate.body.title,
-                                            keywords: metadata.body.keywords,
-                                            author: publicationDate.body.author,
-                                            pubDate: actualPubDate,
-                                            text: content.body.text
-                                        }
-                                    });
-                                });
-                            }
+                            });
                         }
-                    );
-                }
-            );
-        });
+                    }
+                );
+            }
+        );
     } else {
         res.json(400, {message: "Missing data", errMessage: "No data was received from the request."}); // This endpoint cannot proceed without html content from the request
     }
