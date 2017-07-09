@@ -5,10 +5,11 @@ var Account = new Schema({
     userID: String,
     teamCode: String,
     email: String,
-    firstName: String,
-    lastName: String,
-    numArticles: Number,
     name: String,
+    articles: [{
+        type: Schema.Types.ObjectId,
+        ref: 'Article'
+    }]
 });
 
 module.exports = mongoose.model('Account', Account);

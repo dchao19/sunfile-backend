@@ -10,6 +10,8 @@ var Team = require('../models/Team');
 var Utils = require('../utils/utils');
 var utils = new Utils();
 
+import Account from '../models/Account';
+
 router.use(passport.authenticate('jwt', {
     session: false,
     failureRedirect: '/api/auth/loudfailure'
@@ -122,6 +124,8 @@ router.post('/new', async function(req, res) {
             });
         }
 
+        let user = await Account.findOne({userID: req.user.userID});
+
         let fileCodes = await utils.findFileCodes(req.body.url);
         var newArticle = new Article({
             title: req.body.title,
@@ -130,7 +134,6 @@ router.post('/new', async function(req, res) {
             user: req.user.email,
             teamCode: req.user.teamCode
         });
-
 
         let duplicateArticle = await Article.findOne({
             title: newArticle.title,
@@ -147,6 +150,7 @@ router.post('/new', async function(req, res) {
         }
 
         team.articles.push(newArticle._id);
+        user.articles.push(newArticle._id);
         team.save();
         newArticle.save();
 
