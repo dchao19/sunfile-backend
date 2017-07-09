@@ -173,6 +173,26 @@ describe('Tests on /teams', () => {
                         done();
                     });
             });
+
+            it('should update ther user\'s team code', (done) => {
+                request(app)
+                    .post('/api/teams/new')
+                    .set('Authorization', `Bearer ${idToken}`)
+                    .send({
+                        schoolName: testData.newSchoolName,
+                        contactEmail: testData.newContactEmail
+                    })
+                    .expect(200)
+                    .end(async (err) => {
+                        if (err) {
+                            return done(err);
+                        }
+
+                        let user = await Account.findOne({userID: testData.userID});
+                        expect(user.teamCode).to.exist.and.to.equal(testData.existingTeamCode);
+                        done();
+                    });
+            });
         });
     });
     describe('Joining an existing team', () => {
