@@ -30,47 +30,39 @@ router.get('/', async function(req, res) {
     }
 });
 
-router.post('/new', router.use(passport.authenticate('jwt', {
+router.post('/new', passport.authenticate('jwt', {
     session: false,
     failureRedirect: '/api/auth/loudfailure'
-})), async function (req, res) {
-    if (typeof req.user.app_metadata !== 'undefined' && req.user.app_metadata.advancedRole === "admin") {
-        try {
-            let source = await Source.findOne({host: req.body.host});
-            if (source) {
-                res.status(409).json({
-                    success: false,
-                    message: 'already-exists-error',
-                    errorCode: 1,
-                    errMessage: "This source already exists with the given host."
-                });
-            } else {
-                let newSource = new Source({
-                    shortName: req.body.shortName,
-                    longName: req.body.longName,
-                    host: req.body.host
-                });
-                await newSource.save();
-                res.json({
-                    success: true,
-                    message: 'success',
-                    result: newSource
-                });
-            }
-        } catch (e) {
-            res.status(500).json({
+}), async function (req, res) {
+    try {
+        let source = await Source.findOne({host: req.body.host});
+        if (source) {
+            return res.status(409).json({
                 success: false,
-                message: 'server-error',
-                errorCode: 0,
-                errMessage: "An internal server error has occured."
+                message: 'already-exists-error',
+                errorCode: 1,
+                errMessage: "This source already exists with the given host."
             });
         }
-    } else {
-        res.status(401).json({
+
+        let newSource = new Source({
+            shortName: req.body.shortName,
+            longName: req.body.longName,
+            host: req.body.host
+        });
+        await newSource.save();
+
+        res.json({
+            success: true,
+            message: 'success',
+            result: newSource
+        });
+    } catch (e) {
+        res.status(500).json({
             success: false,
-            message: 'unprivileged',
-            errorCode: -101,
-            errMessage: "You are not the current auth level to preform this action."
+            message: 'server-error',
+            errorCode: 0,
+            errMessage: "An internal server error has occured."
         });
     }
 });
