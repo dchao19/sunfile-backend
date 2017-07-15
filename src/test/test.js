@@ -189,7 +189,7 @@ describe('Tests on /teams', () => {
                         }
 
                         let user = await Account.findOne({userID: testData.userID});
-                        expect(user.teamCode).to.exist.and.to.equal(testData.existingTeamCode);
+                        expect(user.teamCode).to.exist;
                         done();
                     });
             });
