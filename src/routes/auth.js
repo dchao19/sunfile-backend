@@ -5,7 +5,7 @@ var router = express.Router(); // eslint-disable-line
 router.get('/quietfailure', (req, res) => {
     res.send({
         success: true,
-        message: 'successaAAAAAAAAAAAAAAAAAAAAA',
+        message: 'success',
         result: {
             authenticated: false
         }

@@ -19,11 +19,11 @@ router.get('/user', async (req, res) => {
             return res.status(404).json({
                 success: false,
                 message: 'not-found-error',
-                errorCode: 3,
-                errMessage: 'The user\'s team could not be found'
+                errorCode: 2,
+                errMessage: 'The team with the given team ID does not exist.'
             });
         }
-
+        
         res.json({
             success: true,
             message: 'success',
@@ -63,6 +63,7 @@ router.get('/stats', async function (req, res) {
     try {
         let statUtils = new StatUtils();
         let team = await Team.findOne({teamCode: req.user.teamCode}).populate('users articles');
+
         if (!team) {
             return res.json({
                 success: false,
@@ -72,14 +73,6 @@ router.get('/stats', async function (req, res) {
             });
         }
 
-        let teamUsers = team.users.map((user) => {
-            return {
-                email: user.email,
-                firstName: user.name.substring(0, user.name.indexOf(" ")),
-                lastName: user.name.substring(user.name.indexOf(" ") + 1),
-                numArticles: user.numArticles
-            };
-        });
 
         let userArticles = await Article.find({user: req.user.email});
         let [userCharts, teamCharts] = await Promise.all([
@@ -102,7 +95,7 @@ router.get('/stats', async function (req, res) {
                 teamInfo: {
                     name: team.schoolName,
                     code: team.teamCode,
-                    users: teamUsers
+                    users: team.users
                 }
             }
         });

@@ -9,11 +9,10 @@ const jsdom = require("jsdom");
 const {JSDOM} = jsdom;
 
 var Article = require('../models/Article');
+var Account = require('../models/Account');
 var Team = require('../models/Team');
 var Utils = require('../utils/utils');
 var utils = new Utils();
-
-import Account from '../models/Account';
 
 router.use(passport.authenticate('jwt', {
     session: false,
@@ -128,6 +127,7 @@ router.post('/new', async function(req, res) {
         }
 
         let user = await Account.findOne({userID: req.user.userID});
+        console.log(user);
 
         let fileCodes = await utils.findFileCodes(req.body.url);
         var newArticle = new Article({
@@ -154,6 +154,8 @@ router.post('/new', async function(req, res) {
 
         team.articles.push(newArticle._id);
         user.articles.push(newArticle._id);
+
+        user.save();
         team.save();
         newArticle.save();
 

@@ -114,4 +114,35 @@ router.post('/join', async function(req, res) {
     }
 });
 
+router.get('/joinstatus', async function (req, res) {
+    if (!req.user.teamCode) {
+        return res.json({
+            success: true,
+            message: 'success',
+            result: {
+                joined: false
+            }
+        });
+    }
+
+    let team = await Team.findOne({teamCode: req.user.teamCode});
+    if (!team) {
+        return res.json({
+            success: true,
+            message: 'success',
+            result: {
+                joined: false
+            }
+        });
+    }
+
+    return res.json({
+        succes: true,
+        message: 'success',
+        result: {
+            joined: true
+        }
+    });
+});
+
 module.exports = router;
