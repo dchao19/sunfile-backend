@@ -3,3 +3,4 @@ node_modules
 utils/apiKeys.js
 build/
 .vscode/launch.json
+\.env
