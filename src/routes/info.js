@@ -4,6 +4,7 @@ var router = express.Router(); // eslint-disable-line
 
 var Team = require('../models/Team');
 var Article = require('../models/Article');
+var Account = require('../models/Account');
 
 var StatUtils = require('../utils/statUtils');
 
@@ -11,6 +12,40 @@ router.use(passport.authenticate('jwt', {
     session: false,
     failureRedirect: '/api/auth/loudfailure'
 }));
+
+router.get('/', async (req, res) => {
+    try {
+        let team = await Team.findOne({teamCode: req.user.teamCode});
+        let user = await Account.findOne({userID: req.user.userID});
+
+        if (!team) {
+            return res.status(404).json({
+                success: false,
+                message: 'not-found-error',
+                errorCode: 2,
+                errMessage: 'The team with the given team code does not exist'
+            });
+        }
+
+        return res.json({
+            teamInfo: {
+                schoolName: team.schoolName,
+                teamCode: team.teamCode,
+                numArticles: team.articles.length
+            },
+            userInfo: {
+                numArticles: user.articles.length
+            }
+        });
+    } catch (e) {
+        res.status(500).json({
+            success: false,
+            message: 'server-error',
+            errorCode: 0,
+            errMessage: 'An internal server error has occured.'
+        });
+    }
+});
 
 router.get('/user', async (req, res) => {
     try {
