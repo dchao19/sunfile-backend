@@ -28,13 +28,17 @@ router.get('/', async (req, res) => {
         }
 
         return res.json({
-            teamInfo: {
-                schoolName: team.schoolName,
-                teamCode: team.teamCode,
-                numArticles: team.articles.length
-            },
-            userInfo: {
-                numArticles: user.articles.length
+            success: true,
+            message: 'success',
+            result: {
+                teamInfo: {
+                    schoolName: team.schoolName,
+                    teamCode: team.teamCode,
+                    numArticles: team.articles.length
+                },
+                userInfo: {
+                    numArticles: user.articles.length
+                }
             }
         });
     } catch (e) {
