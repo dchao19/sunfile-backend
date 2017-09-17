@@ -61,28 +61,37 @@ router.post("/content", function(req, res) {
                                 errMessage: "An unexpected server error has occured."
                             });
                         } else {
-                            let publicationDate = await apiHelpers.aylienAsyncData(apiUrls.DATE, {
-                                html: htmlData
-                            });
-                            let actualPubDate = publicationDate.body.publishDate
-                                ? publicationDate.body.publishDate
-                                : metadata.body.publicationDate.date;
-                            apiHelpers.parseKeywords(metadata.body.keywords, [], 0, function(
-                                keywords
-                            ) {
-                                // Node can't do sync loops so we do this method recursively and callback when complete
-                                res.json({
-                                    message: "success",
-                                    result: {
-                                        paragraphs: apiHelpers.parseParagraphs(content.body.text), // The templater expects the paragraphs to be arrays of key/value pairs
-                                        title: publicationDate.body.title,
-                                        keywords: metadata.body.keywords,
-                                        author: publicationDate.body.author,
-                                        pubDate: actualPubDate,
-                                        text: content.body.text
+                            try {
+                                let publicationDate = await apiHelpers.aylienAsyncData(
+                                    apiUrls.DATE,
+                                    {
+                                        html: htmlData
                                     }
+                                );
+                                let actualPubDate = publicationDate.body.publishDate
+                                    ? publicationDate.body.publishDate
+                                    : metadata.body.publicationDate.date;
+                                apiHelpers.parseKeywords(metadata.body.keywords, [], 0, function(
+                                    keywords
+                                ) {
+                                    // Node can't do sync loops so we do this method recursively and callback when complete
+                                    res.json({
+                                        message: "success",
+                                        result: {
+                                            paragraphs: apiHelpers.parseParagraphs(
+                                                content.body.text
+                                            ), // The templater expects the paragraphs to be arrays of key/value pairs
+                                            title: publicationDate.body.title,
+                                            keywords: metadata.body.keywords,
+                                            author: publicationDate.body.author,
+                                            pubDate: actualPubDate,
+                                            text: content.body.text
+                                        }
+                                    });
                                 });
-                            });
+                            } catch (e) {
+                                console.error(e);
+                            }
                         }
                     }
                 );
