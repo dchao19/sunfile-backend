@@ -1,5 +1,5 @@
-var unirest = require('unirest');
-var apiKeys = require('./apiKeys');
+var unirest = require("unirest");
+var apiKeys = require("./apiKeys");
 
 var apiHelpers = {
     watsonRequestFactory: function(url, data, callback) {
@@ -12,7 +12,7 @@ var apiHelpers = {
     },
     parseParagraphs: function(text) {
         return text.split("\n").map(function(obj) {
-            return {paragraphContent: obj};
+            return { paragraphContent: obj };
         });
     },
     parseKeywords: function(keywords, newKeywords, currentIndex, callback) {
@@ -21,7 +21,7 @@ var apiHelpers = {
             return;
         }
 
-        if (keywords[currentIndex].relevance >= 0.90) {
+        if (keywords[currentIndex].relevance >= 0.9) {
             newKeywords.push(keywords[currentIndex].text);
         }
 
@@ -38,8 +38,7 @@ var apiHelpers = {
         request.end(callback);
     },
     aylienAsyncData: function(url, data) {
-        return new Promise((resolve) => {
-            console.log("doing something");
+        return new Promise(resolve => {
             var request = unirest("POST", url);
             request.headers({
                 "Content-Type": "application/x-www-form-urlencoded",
@@ -47,7 +46,7 @@ var apiHelpers = {
                 "X-AYLIEN-TextAPI-Application-ID": apiKeys.aylien.appId
             });
             request.form(data);
-            request.end((content) => {
+            request.end(content => {
                 resolve(content);
             });
         });

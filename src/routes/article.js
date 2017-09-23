@@ -12,6 +12,7 @@ var Article = require("../models/Article");
 var Account = require("../models/Account");
 var Team = require("../models/Team");
 var Utils = require("../utils/utils");
+var URL = require("url").URL;
 var utils = new Utils();
 
 router.use(
@@ -23,8 +24,6 @@ router.use(
 
 router.post("/content", function(req, res) {
     req.accepts("html"); // The easiest way to not break the formatting of JSON is by directly POSTing the HTML content of page. Potentially insecure.
-
-    console.log(process.env);
 
     if (req.body) {
         // Confirm HTML data was sent in the request
@@ -68,6 +67,9 @@ router.post("/content", function(req, res) {
                                         html: htmlData
                                     }
                                 );
+
+                                console.log(publicationDate);
+
                                 let actualPubDate = publicationDate.body.publishDate
                                     ? publicationDate.body.publishDate
                                     : metadata.body.publicationDate.date;
@@ -167,13 +169,20 @@ router.post("/new", async function(req, res) {
         }
 
         let user = await Account.findOne({ userID: req.user.userID });
-        console.log(user);
 
         let fileCodes = await utils.findFileCodes(req.body.url);
+        let shortPublication =
+            !fileCodes || !fileCodes.shortName
+                ? new URL(req.body.url).hostname
+                : fileCodes.shortName;
+
+        let longPublication =
+            !fileCodes || !fileCodes.longName ? new URL(req.body.url).hostname : fileCodes.longName;
+
         var newArticle = new Article({
             title: req.body.title,
-            longPublication: fileCodes.longName,
-            shortPublication: fileCodes.shortName,
+            longPublication,
+            shortPublication,
             user: req.user.email,
             teamCode: req.user.teamCode
         });
@@ -218,13 +227,14 @@ router.post("/new", async function(req, res) {
 router.get("/recents", async (req, res) => {
     try {
         let queryLength = req.query.length ? req.query.length : 5;
-        let articles = await Article.find({ user: req.user.email });
+        let articles = await Article.find({ user: req.user.email })
+            .sort({ createdAt: -1 })
+            .limit(5);
 
-        let result = articles.slice(articles.length - queryLength);
         res.send({
             success: true,
             message: "success",
-            result
+            result: articles
         });
     } catch (e) {
         res.status(500).json({
@@ -247,8 +257,17 @@ router.delete("/delete", async (req, res) => {
                     "The _id property was not specified with the request. This is a required parameter"
             });
         }
+
+        let user = await Account.findOne({ userID: req.user.userID });
+        let team = await Team.findOne({ teamCode: req.user.teamCode });
         let article = await Article.findByIdAndRemove(req.query._id);
         if (article) {
+            user.articles = user.articles.filter(id => id.toString() !== req.query._id);
+            team.articles = team.articles.filter(id => id.toString() !== req.query._id);
+
+            await user.save();
+            await team.save();
+
             return res.json({
                 success: true,
                 message: "deleted"
