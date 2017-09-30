@@ -54,7 +54,8 @@
     "private": true,
     "main": "start.js",
     "scripts": {
-        "start": "npm run build && node build/server.js",
+        "start": "node build/server.js",
+        "prestart": "npm run build",
         "watch": "concurrently \"npm run build-watch\" \"nodemon build/server.js\"",
         "test": "cross-env NODE_ENV=test mocha build/test",
         "build-watch": "babel src --out-dir build --watch --source-maps",
