@@ -21,8 +21,7 @@ var infoRoutes = require("./routes/info");
 require("./config/passportConfig");
 require("./config/dbConfig.js");
 
-var ipaddress = process.env.OPENSHIFT_NODEJS_IP || "127.0.0.1";
-var port = process.env.OPENSHIFT_NODEJS_PORT || 3000;
+var port = process.env.PORT || 3000;
 
 if (process.env.NODE_ENV === "heroku-staging") {
     port = process.env.PORT;
@@ -59,9 +58,9 @@ app.use("/api/info", infoRoutes);
 app.use("/api/mobile", mobileRoutes);
 app.use("/api/article", articleRoutes);
 
-app.listen(port, ipaddress, () => {
+app.listen(port, () => {
     if (process.env.NODE_ENV !== "test") {
-        console.log("Express server listening on " + ipaddress + ":" + port);
+        console.log("Express server listening on " + port);
     }
 });
 
