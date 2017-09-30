@@ -8,7 +8,9 @@ cache:
 before_script:
 - yarn build
 before_deploy:
-  - git fetch --unshallow
+- git fetch --unshallow
 deploy:
-  provider: azure_web_apps
-  site: sunfile-v3
+  provider: heroku
+  app: sunfile-v3-production
+  api_key:
+    secure: HD82UZRdHq4d9ev6Lo6pwm/MPt1C4QTnwG5pF0lgoFndy5Y1mHsKKBBDSXp5iCorUBc90YU9C9ZUjPbqFpjFXKTgDQyGnpxqs3rIbZwt8qcvOM0CvQuD5x3/bZEDbkdFvGlqEjkNgCPkjVFQpUGob3tFmuXNZyX5CE+Rup5lGLZHIVQ9nCYEkntBtnfh4EFI+bs8NXi0Xe03AEmXvqdaaqw4X0/yNBM/zcT6nPi6QNDvY5IHBwR2/kVrS4SGSH4fNjBBktw84wX+SLMJG+hJa0Ozz05jg6BnQo2KNaOcvIUEUz6jNsD5bQ0m01rkXwmr/ScfhOwEJFKcqKtZyEGQsvO4uBfD9203dEiB/sjm1iUq0Uo1mp/R+hHAK18lwXkn1soSroS4n8/mZWwZVJ+BJVCDbb8Wr8bBSnXZvT0kIBptZg6Fv5Wqh50akHpw/xUg/JxQlmxap7g8kF+0lH+nrSWJlSuQiBph3gMkl76CKoa4l4SW/48IfvkEi+VbSKUpZmixilN751U2/Pe5ElPCSFDWsGd2S+TxyaWj491/BB8YAH0WRH+m0ZuKyOMk+e0Gx+c1BS3fn+D5MUeYYvDw8Uz1iS1Aj7dC2HuWklQ6e1CL7Sq+2KuAGFbh2PNmkMwx301ds5Fxt3jlTH1aVv1gya202NpDUlTz10FjvZsaepQ=
