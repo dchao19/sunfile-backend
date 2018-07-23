@@ -43,7 +43,7 @@ router.post("/content", async function(req, res) {
         result: {
             paragraphs, // The templater expects the paragraphs to be arrays of key/value pairs
             title: extractionData.title,
-            keywords: extractionData.keywords,
+            keywords: [],
             author: extractionData.author,
             pubDate: extractionData.publishDate,
             text: extractionData.article
