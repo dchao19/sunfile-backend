@@ -32,13 +32,14 @@ router.post("/content", async function(req, res) {
     }
 
     const pruned = pruneHtml(req.body);
-    const extractionData = (await apiHelpers.aylienAsyncData(apiUrls.AYLIEN_EXTRACTION, pruned))
-        .body;
+    const extractionData = (await apiHelpers.aylienAsyncData(apiUrls.AYLIEN_EXTRACTION, {
+        html: pruned
+    })).body;
 
     const paragraphs = apiHelpers.parseParagraphs(extractionData.article);
 
     res.json({
-        message: success,
+        message: "success",
         result: {
             paragraphs, // The templater expects the paragraphs to be arrays of key/value pairs
             title: extractionData.title,
