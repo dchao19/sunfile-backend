@@ -11,7 +11,7 @@ var apiHelpers = {
         request.end(callback);
     },
     parseParagraphs: function(text) {
-        return text.split("\n").map(function(obj) {
+        return text.split("\n\n").map(function(obj) {
             return { paragraphContent: obj };
         });
     },
