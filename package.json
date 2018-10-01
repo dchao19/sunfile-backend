@@ -33,7 +33,7 @@
         "just.randomcolor": "^0.1.1",
         "mocha": "^3.4.2",
         "moment": "^2.18.1",
-        "mongoose": "^4.11.0",
+        "mongoose": "^5.3.0",
         "mongoose-timestamp": "^0.6.0",
         "morgan": "^1.8.2",
         "nodemon": "^1.11.0",
