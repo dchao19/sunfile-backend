@@ -14,7 +14,7 @@
     },
     "homepage": "https://sunfile.danielchao.me",
     "engines": {
-        "node": "10.7.0"
+        "node": "10.11.0"
     },
     "dependencies": {
         "async": "^2.5.0",
