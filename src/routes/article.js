@@ -145,12 +145,12 @@ router.post("/new", async function(req, res) {
             });
         }
 
+        console.log(`Article ID: ${newArticle._id}`);
+
         team.articles.push(newArticle._id);
         user.articles.push(newArticle._id);
 
-        user.save();
-        team.save();
-        newArticle.save();
+        await Promise.all([user.save(), team.save(), newArticle.save()]);
 
         res.json({
             success: true,
