@@ -1,7 +1,10 @@
 ﻿import mongoose from "mongoose";
 
 var connectionString = "127.0.0.1:27017/sunfile-beta";
-let options = {};
+let options = {
+    useMongoClient: true,
+    usePushEach: true
+};
 
 if (process.env.NODE_ENV === "test") {
     connectionString = "mongodb://localhost:27017/sunfile-test";
@@ -17,11 +20,15 @@ if (process.env.NODE_ENV === "test") {
     };
 }
 
-mongoose.connect(connectionString, options, function(err) {
-    if (err) {
-        throw err;
+mongoose.connect(
+    connectionString,
+    options,
+    function(err) {
+        if (err) {
+            throw err;
+        }
+        if (process.env.NODE_ENV !== "test") {
+            console.log("Successfully connected to MongoDB");
+        }
     }
-    if (process.env.NODE_ENV !== "test") {
-        console.log("Successfully connected to MongoDB");
-    }
-});
+);
