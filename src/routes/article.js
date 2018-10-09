@@ -37,7 +37,7 @@ router.post("/content", async function(req, res) {
         html: pruned
     })).body;
 
-    const metadata = await metascraper({ url: "", html: pruned });
+    const metadata = await metascraper({ url: "http://nothing.com", html: pruned });
 
     const paragraphs = apiHelpers.parseParagraphs(extractionData.article);
 
