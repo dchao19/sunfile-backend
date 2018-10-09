@@ -11,6 +11,7 @@ var Team = require("../models/Team");
 var Utils = require("../utils/utils");
 var URL = require("url").URL;
 var utils = new Utils();
+const metascraper = require("metascraper")([require("metascraper-date")()]);
 
 import { pruneHtml } from "../utils/articleUtils";
 
@@ -36,6 +37,8 @@ router.post("/content", async function(req, res) {
         html: pruned
     })).body;
 
+    const metadata = await metascraper({ url: "", html: pruned });
+
     const paragraphs = apiHelpers.parseParagraphs(extractionData.article);
 
     res.json({
@@ -45,7 +48,7 @@ router.post("/content", async function(req, res) {
             title: extractionData.title,
             keywords: [],
             author: extractionData.author,
-            pubDate: extractionData.publishDate,
+            pubDate: metadata.date,
             text: extractionData.article
         }
     });
