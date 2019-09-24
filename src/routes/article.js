@@ -32,7 +32,14 @@ router.post("/content", async function(req, res) {
         }); // This endpoint cannot proceed without html content from the request
     }
 
+    console.log("beforePrune");
+    console.log(Buffer.byteLength(req.body, 'utf8'));
+    
     const pruned = pruneHtml(req.body);
+    
+    console.log("afterPrune");
+    console.log(Buffer.byteLength(pruned, 'utf8'));
+    
     const extractionData = (await apiHelpers.aylienAsyncData(apiUrls.AYLIEN_EXTRACTION, {
         html: pruned
     })).body;
