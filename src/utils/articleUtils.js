@@ -11,6 +11,9 @@ const pruneHtml = htmlData => {
         .remove()
         .end()
         .html();
+    
+    console.log("pruned");
+    console.log(htmlData);
 
     return htmlData;
 };
