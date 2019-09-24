@@ -34,7 +34,7 @@ var apiHelpers = {
             "X-AYLIEN-TextAPI-Application-Key": apiKeys.aylien.key,
             "X-AYLIEN-TextAPI-Application-ID": apiKeys.aylien.appId
         });
-        request.form(data);
+        request.send(data);
         request.end(callback);
     },
     aylienAsyncData: function(url, data) {
