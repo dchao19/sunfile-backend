@@ -13,9 +13,6 @@
         "url": "https://danielchao.me"
     },
     "homepage": "https://sunfile.danielchao.me",
-    "engines": {
-        "node": "10.11.0"
-    },
     "dependencies": {
         "async": "^2.5.0",
         "babel-cli": "^6.26.0",
