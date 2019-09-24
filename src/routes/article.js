@@ -36,6 +36,9 @@ router.post("/content", async function(req, res) {
     const extractionData = (await apiHelpers.aylienAsyncData(apiUrls.AYLIEN_EXTRACTION, {
         html: pruned
     })).body;
+    
+    console.log("extractionData");
+    console.log(extractionData);
 
     const metadata = await metascraper({ url: "http://nothing.com", html: pruned });
 
