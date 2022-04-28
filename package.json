@@ -14,7 +14,7 @@
     },
     "homepage": "https://sunfile.danielchao.me",
     "dependencies": {
-        "async": "^2.5.0",
+        "async": "^2.6.4",
         "babel-cli": "^6.26.0",
         "babel-polyfill": "^6.23.0",
         "body-parser": "^1.17.2",
