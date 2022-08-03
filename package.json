@@ -28,7 +28,7 @@
         "jsdom": "^11.1.0",
         "jsonwebtoken": "^7.4.1",
         "just.randomcolor": "^0.1.1",
-        "metascraper": "^4.4.4",
+        "metascraper": "^5.2.0",
         "metascraper-date": "^4.3.5",
         "mocha": "^3.4.2",
         "moment": "^2.18.1",
